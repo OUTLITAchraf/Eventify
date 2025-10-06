@@ -41,7 +41,7 @@ export default function RegisterPage() {
       const result = await dispatch(registerUser(data));
       if (result && !error) {
         // On success, navigate to login page
-        alert("Registration successfully!");
+        navigate("/login")
       }
     } catch (err) {
       // Error handling is now managed by Redux state
