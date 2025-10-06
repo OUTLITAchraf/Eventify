@@ -17,6 +17,10 @@ return [
             'events' => 'c,r,u,d',
             'profile' => 'r,u',
         ],
+        'organizer' => [
+            'events' => 'c,r,u,d',
+            'profile' => 'r,u',
+        ],
         'user' => [
             'events' => 'r',
             'profile' => 'r,u',
