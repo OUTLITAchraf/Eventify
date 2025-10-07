@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\EventController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -22,6 +23,9 @@ Route::middleware('api')->group(function () {
     
     // Protected routes
     Route::middleware('auth:sanctum')->group(function () {
-        // Add protected routes here
+        Route::get('/events',[EventController::class, 'index']);
+        Route::post('/create-event', [EventController::class, 'store']);
+        Route::put('/update-event/{event}', [EventController::class, 'update']);
+        Route::delete('/delete-event/{event}', [EventController::class, 'destroy']);
     });
 });
