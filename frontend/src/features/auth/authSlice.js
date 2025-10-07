@@ -39,29 +39,31 @@ export const loginUser = createAsyncThunk(
   }
 );
 
+export const LogoutUser = createAsyncThunk(
+  "auth/logout",
+  async (_, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem('token');
+      await axios.post(`${API_URL}/logout`,{},{
+        headers: {
+          Authorization: `Bearer ${token}`,
+        }
+      });
+
+      localStorage.removeItem('token');
+      return null;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Logout failed');
+    }
+  }
+)
+
 export const fetchUser = createAsyncThunk(
   'auth/fetchuser',
   async (_, { rejectWithValue}) => {
     try {
       const token = localStorage.getItem('token');
       const response = await axios.get(`${API_URL}/user`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      return response.data;
-    } catch(error){
-      return rejectWithValue(error.response.data);
-    }
-  }
-)
-
-export const LogoutUser = createAsyncThunk(
-  "auth/logout",
-  async (_, { rejectWithValue}) => {
-    try {
-      const token = localStorage.getItem('token');
-      const response = await axios.post(`${API_URL}/logout`, {}, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -87,6 +89,12 @@ const authSlice = createSlice({
       state.error = null;
       state.message = null;
     },
+    clearAuth: (state) => {
+      state.user = null;
+      state.token = null;
+      state.status = 'idle';
+      state.error = null;
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -149,12 +157,12 @@ const authSlice = createSlice({
         state.error = null;
         console.log("LogoutUser pending");
       })
-      .addCase(LogoutUser.fulfilled, (state, action) => {
-        state.status = "succeeded";
+      .addCase(LogoutUser.fulfilled, (state) => {
         state.user = null;
         state.token = null;
+        state.status = 'idle';
         state.error = null;
-        console.log("LogoutUser fulfilled", action.payload);
+        console.log("LogoutUser fulfilled");
       })
       .addCase(LogoutUser.rejected, (state, action) => {
         state.status = "failed";
@@ -164,5 +172,5 @@ const authSlice = createSlice({
   },
 });
 
-export const { clearError } = authSlice.actions;
+export const { clearError, clearAuth } = authSlice.actions;
 export default authSlice.reducer;

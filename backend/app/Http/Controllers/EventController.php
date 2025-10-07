@@ -46,7 +46,7 @@ class EventController extends Controller
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
+            'description' => 'required|string',
             'start_time' => 'required|date',
             'end_time' => 'required|date|after_or_equal:start_time',
             'status' => 'required|in:scheduled,ongoing,completed',
@@ -54,7 +54,7 @@ class EventController extends Controller
             'location' => 'nullable|string|max:255',
             'link' => 'nullable|url|max:255',
             'image' => 'nullable|string|max:255',
-            'category' => 'nullable|string|max:255',
+            'category' => 'required|string|max:255',
         ]);
 
         $event = new Event($validated);

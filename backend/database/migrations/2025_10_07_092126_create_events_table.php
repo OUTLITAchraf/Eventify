@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('events', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->text('description')->nullable();
+            $table->text('description');
             $table->dateTime('start_time');
             $table->dateTime('end_time');
             $table->enum('status', ['scheduled', 'ongoing', 'completed'])->default('scheduled');
@@ -22,7 +22,7 @@ return new class extends Migration
             $table->string('location')->nullable();
             $table->string('link')->nullable();
             $table->string('image')->nullable();
-            $table->string('category')->nullable();
+            $table->string('category');
             $table->foreignId('organizer_id')->constrained('users')->onDelete('cascade');
             $table->timestamps();
         });

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Outlet, Link, useNavigate } from 'react-router-dom';
 import { Calendar, Menu, X, User, LogOut, ChevronDown } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchUser, LogoutUser } from '../features/auth/authSlice';
+import { fetchUser, LogoutUser, clearAuth } from '../features/auth/authSlice';
 
 function AuthLayout() {
     const { user } = useSelector((state) => state.auth);
@@ -16,6 +16,8 @@ function AuthLayout() {
         const token = localStorage.getItem('token');
         if (token && !user) {
             dispatch(fetchUser());
+        } else if (!token) {
+            dispatch(clearAuth());
         }
     }, [dispatch, user]);
 
@@ -32,7 +34,7 @@ function AuthLayout() {
     const handleLogout = async () => {
         try {
             await dispatch(LogoutUser()).unwrap();
-            localStorage.removeItem('token');
+            dispatch(clearAuth());
             navigate('/login');
         } catch (error) {
             console.error('Logout failed:', error);
