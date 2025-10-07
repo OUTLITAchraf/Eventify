@@ -12,16 +12,6 @@ class EventController extends Controller
      */
     public function index()
     {
-        $user = auth()->user();
-
-        if (!$user) {
-            return response()->json(['message' => 'Unauthenticted'], 401);
-        }
-
-        if (!$user->hasRole('organizer')) {
-            return response()->json(['message' => 'Unauthorized'], 403);
-        }
-
         $events = Event::all();
 
         return response()->json([

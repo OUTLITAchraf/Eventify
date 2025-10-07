@@ -20,10 +20,10 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('api')->group(function () {
     Route::post('/register', [RegisteredUserController::class, 'store']);
     Route::post('/login', [AuthenticatedSessionController::class, 'store']);
+    Route::get('/events',[EventController::class, 'index']);
     
     // Protected routes
     Route::middleware('auth:sanctum')->group(function () {
-        Route::get('/events',[EventController::class, 'index']);
         Route::post('/create-event', [EventController::class, 'store']);
         Route::put('/update-event/{event}', [EventController::class, 'update']);
         Route::delete('/delete-event/{event}', [EventController::class, 'destroy']);
