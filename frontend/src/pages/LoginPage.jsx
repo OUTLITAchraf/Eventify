@@ -5,7 +5,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { Calendar, CheckCircle, Mail, Lock, Eye, EyeOff } from "lucide-react";
+import { Calendar, CheckCircle, Mail, Lock, Eye, EyeOff, ArrowLeft } from "lucide-react";
 import { loginUser } from "../features/auth/authSlice";
 
 const schema = yup.object().shape({
@@ -36,24 +36,18 @@ export default function LoginPage() {
       if (result.token) {
         // Store token in localStorage
         localStorage.setItem("token", result.token);
-        // Navigate to dashboard on successful login
-        alert("Login successfully!");
+        navigate("/profile")
       }
     } catch (err) {
       console.error("Login failed:", err);
     }
   };
 
-  // Redirect if already logged in
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      alert("Login successfully!");
-    }
-  }, [navigate]);
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-600 via-purple-700 to-indigo-800 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-purple-600 via-purple-700 to-indigo-800 flex items-center justify-center p-4 relative">
+      <Link to="/" className="absolute top-6 left-6 text-white bg-white/20 p-3 rounded-full hover:bg-white/30 transition-colors z-10">
+        <ArrowLeft className="w-6 h-6" />
+      </Link>
       <div className="w-full max-w-5xl bg-white rounded-3xl shadow-2xl overflow-hidden grid md:grid-cols-2">
         {/* Left Section - Branding */}
         <div className="bg-gradient-to-br from-purple-600 to-indigo-700 p-12 text-white flex flex-col justify-center">

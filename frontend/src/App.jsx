@@ -6,19 +6,30 @@ import LoginPage from './pages/LoginPage'
 import DetailProfile from './pages/Organizer/Profile/DetailProfile'
 import AuthLayout from './layouts/AuthLayout'
 import GuestLayout from './layouts/GuestLayout'
+import ProtectedRoute from './layouts/ProtectedRoute'
+import GuestRoute from './layouts/GuestRoute'
 
 function App() {
   return (
     <>
       <BrowserRouter>
         <Routes>
+          {/* Public Routes */}
           <Route element={<GuestLayout />}>
             <Route path='/' element={<HomePage />} />
           </Route>
-          <Route path='/login' element={<LoginPage />} />
-          <Route path='/register' element={<RegisterPage />} />
-          <Route element={<AuthLayout />}>
-            <Route path='/profile' element={<DetailProfile />} />
+
+          {/* Guest-only Routes */}
+          <Route element={<GuestRoute />}>
+            <Route path='/login' element={<LoginPage />} />
+            <Route path='/register' element={<RegisterPage />} />
+          </Route>
+
+          {/* Protected Routes */}
+          <Route element={<ProtectedRoute />}>
+            <Route element={<AuthLayout />}>
+              <Route path='/profile' element={<DetailProfile />} />
+            </Route>
           </Route>
         </Routes>
       </BrowserRouter>

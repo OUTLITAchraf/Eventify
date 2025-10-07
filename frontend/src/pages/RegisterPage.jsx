@@ -1,4 +1,4 @@
-import { Calendar, CheckCircle, Mail, Lock, User } from "lucide-react";
+import { Calendar, CheckCircle, Mail, Lock, User, ArrowLeft } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { registerUser } from "../features/auth/authSlice";
 import { useNavigate, Link } from "react-router-dom";
@@ -61,7 +61,10 @@ export default function RegisterPage() {
   }, [status, navigate]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-600 via-purple-700 to-indigo-800 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-purple-600 via-purple-700 to-indigo-800 flex items-center justify-center p-4 relative">
+      <Link to="/" className="absolute top-6 left-6 text-white bg-white/20 p-3 rounded-full hover:bg-white/30 transition-colors z-10">
+        <ArrowLeft className="w-6 h-6" />
+      </Link>
       <div className="w-full max-w-5xl bg-white rounded-3xl shadow-2xl overflow-hidden grid md:grid-cols-2">
         {/* Left Section */}
         <div className="bg-gradient-to-br from-purple-600 to-indigo-700 p-12 text-white flex flex-col justify-center">

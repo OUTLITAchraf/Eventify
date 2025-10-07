@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Outlet, Link, useNavigate } from 'react-router-dom';
 import { Calendar, Menu, X, User, LogOut, ChevronDown } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchUser } from '../features/auth/authSlice';
+import { fetchUser, LogoutUser } from '../features/auth/authSlice';
 
 function AuthLayout() {
     const { user } = useSelector((state) => state.auth);
@@ -29,10 +29,14 @@ function AuthLayout() {
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, [dropdownRef]);
 
-    const handleLogout = () => {
-        localStorage.removeItem('token');
-        navigate('/login');
-        window.location.reload(); // To ensure state is cleared across the app
+    const handleLogout = async () => {
+        try {
+            await dispatch(LogoutUser()).unwrap();
+            localStorage.removeItem('token');
+            navigate('/login');
+        } catch (error) {
+            console.error('Logout failed:', error);
+        }
     };
 
     return (

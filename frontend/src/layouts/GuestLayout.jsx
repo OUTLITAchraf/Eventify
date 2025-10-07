@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Link, Outlet } from 'react-router-dom';
 import { Calendar, Menu, X } from 'lucide-react';
 
 function GuestLayout() {
@@ -25,12 +25,12 @@ function GuestLayout() {
                                 <a href="#" className="text-gray-700 hover:text-purple-600 font-medium transition">Events</a>
                                 <a href="#" className="text-gray-700 hover:text-purple-600 font-medium transition">Categories</a>
                                 <a href="#" className="text-gray-700 hover:text-purple-600 font-medium transition">About</a>
-                                <button className="px-6 py-2 text-purple-600 border-2 border-purple-600 rounded-lg font-semibold hover:bg-purple-50 transition">
+                                <Link to={'/login'} className="px-6 py-2 text-purple-600 border-2 border-purple-600 rounded-lg font-semibold hover:bg-purple-50 transition">
                                     Sign In
-                                </button>
-                                <button className="px-6 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg font-semibold hover:from-purple-700 hover:to-indigo-700 transition">
+                                </Link>
+                                <Link to={'/register'} className="px-6 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg font-semibold hover:from-purple-700 hover:to-indigo-700 transition">
                                     Sign Up
-                                </button>
+                                </Link>
                             </div>
 
                             {/* Mobile Menu Button */}

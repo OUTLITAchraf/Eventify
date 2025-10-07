@@ -27,6 +27,7 @@ Route::middleware('api')->group(function () {
         Route::get('/user', function (Request $request) {
             return $request->user()->load('roles');
         });
+        Route::post('/logout', [AuthenticatedSessionController::class, 'destroy']);
         Route::post('/create-event', [EventController::class, 'store']);
         Route::put('/update-event/{event}', [EventController::class, 'update']);
         Route::delete('/delete-event/{event}', [EventController::class, 'destroy']);
