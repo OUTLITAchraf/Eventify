@@ -41,7 +41,7 @@ export default function RegisterPage() {
       const result = await dispatch(registerUser(data));
       if (result && !error) {
         // On success, navigate to login page
-        navigate("/login")
+        navigate("/login");
       }
     } catch (err) {
       // Error handling is now managed by Redux state
@@ -73,27 +73,27 @@ export default function RegisterPage() {
               <h1 className="text-4xl font-bold">Eventify</h1>
             </div>
             <h2 className="text-3xl font-bold mb-4 leading-tight">
-              Discover & Join Amazing Events
+              Organize & Manage Your Events Effortlessly
             </h2>
             <p className="text-purple-100 text-lg mb-8">
-              Join thousands of users discovering and attending events every
-              day.
+              Join Eventify as an organizer and reach thousands of attendees
+              with your amazing events.
             </p>
           </div>
 
           <div className="space-y-4">
             {[
               {
-                title: "Browse Events",
-                desc: "Discover events tailored to your interests",
+                title: "Create Events Easily",
+                desc: "Publish your events in minutes with our simple dashboard.",
               },
               {
-                title: "Easy Registration",
-                desc: "One-click registration for any event",
+                title: "Manage Registrations",
+                desc: "Track attendees and manage participation with real-time data.",
               },
               {
-                title: "Stay Updated",
-                desc: "Get notifications for upcoming events",
+                title: "Promote Your Brand",
+                desc: "Gain visibility and connect with a larger audience through Eventify.",
               },
             ].map((item, idx) => (
               <div key={idx} className="flex items-start gap-4">
@@ -113,10 +113,10 @@ export default function RegisterPage() {
         <div className="p-12">
           <div className="mb-8">
             <h2 className="text-3xl font-bold text-gray-800 mb-2">
-              Create Account
+              Create Organizer Account
             </h2>
             <p className="text-gray-600">
-              Join Eventify and start discovering events
+              Join Eventify and start creating your own events today
             </p>
           </div>
 
@@ -158,31 +158,6 @@ export default function RegisterPage() {
               </div>
             )}
 
-            {/* Success message */}
-            {status === "succeeded" && (
-              <div className="bg-green-50 border-l-4 border-green-500 p-4 mb-4">
-                <div className="flex">
-                  <div className="flex-shrink-0">
-                    <svg
-                      className="h-5 w-5 text-green-400"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                  </div>
-                  <div className="ml-3">
-                    <p className="text-sm text-green-600">
-                      Registration successful! Redirecting to login...
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Full Name

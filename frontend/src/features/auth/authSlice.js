@@ -39,6 +39,23 @@ export const loginUser = createAsyncThunk(
   }
 );
 
+export const fetchUser = createAsyncThunk(
+  'auth/fetchuser',
+  async (_, { rejectWithValue}) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.get(`${API_URL}/user`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return response.data;
+    } catch(error){
+      return rejectWithValue(error.response.data);
+    }
+  }
+)
+
 const authSlice = createSlice({
   name: "auth",
   initialState: {
@@ -91,6 +108,23 @@ const authSlice = createSlice({
         state.status = "failed";
         state.error = action.payload;
         console.log("LoginUser Rejected", action.payload)
+      });
+    builder
+      .addCase(fetchUser.pending, (state) => {
+        state.status = "loading";
+        state.error = null;
+        console.log("fetchUser pending");
+      })
+      .addCase(fetchUser.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.user = action.payload;
+        state.error = null;
+        console.log("fetchUser fulfilled", action.payload);
+      })
+      .addCase(fetchUser.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload;
+        console.error("fetchUser rejected", action.payload);
       });
   },
 });
