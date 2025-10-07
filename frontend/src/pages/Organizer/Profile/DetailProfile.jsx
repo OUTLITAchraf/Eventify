@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux';
-import { fetchUser } from '../../../features/auth/authSlice'; // Assuming this is the correct path
+import { fetchUser } from '../../../features/auth/authSlice';
 
 function DetailProfile() {
     const [user, setUser] = useState(null);
     const dispatch = useDispatch();
-    const role = user?.roles?.[0]?.name || "User";
+    const role = user?.roles?.[0]?.display_name || "User";
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -52,14 +52,12 @@ function DetailProfile() {
                         <p className="text-lg font-semibold text-gray-800 mt-1">{user.email}</p>
                     </div>
 
-                    {user.role && (
-                        <div className="border-b pb-4">
-                            <h2 className="text-sm text-gray-500 uppercase">Role</h2>
-                            <p className="text-lg font-semibold text-gray-800 mt-1">
-                                {user.role}
-                            </p>
-                        </div>
-                    )}
+                    <div className="border-b pb-4">
+                        <h2 className="text-sm text-gray-500 uppercase">Role</h2>
+                        <p className="text-lg font-semibold text-gray-800 mt-1">
+                            {role}
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>
