@@ -9,10 +9,13 @@ import GuestLayout from './layouts/GuestLayout'
 import ProtectedRoute from './layouts/ProtectedRoute'
 import GuestRoute from './layouts/GuestRoute'
 import OrganizerDashboard from './pages/Organizer/OrganizerDashboard'
+import CreateEvent from "./pages/Organizer/CreateEvent"
+import { Toaster } from 'react-hot-toast'
 
 function App() {
   return (
     <>
+      <Toaster position='top-right' reverseOrder={false} />
       <BrowserRouter>
         <Routes>
           {/* Public Routes */}
@@ -31,6 +34,7 @@ function App() {
             <Route element={<AuthLayout />}>
               <Route path='/dashboard-organizer' element={<OrganizerDashboard />}/>
               <Route path='/profile' element={<DetailProfile />} />
+              <Route path="/create-event" element={<CreateEvent />} />
             </Route>
           </Route>
         </Routes>

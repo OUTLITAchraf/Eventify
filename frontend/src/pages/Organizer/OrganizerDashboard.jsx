@@ -2,12 +2,14 @@ import { useEffect, useState } from 'react';
 import { Calendar, Plus, Users, Eye, Edit, Trash2, TrendingUp, DollarSign, MapPin, ExternalLink, Search, MoreVertical, CheckCircle, Clock, AlertCircle, Building, Monitor, User, User2, User2Icon } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchEvents } from '../../features/event/eventSlice';
+import { Link } from 'react-router-dom';
 
 export default function OrganizerDashboard() {
   const dispatch = useDispatch();
   const { events, status, error } = useSelector((state) => state.events);
   const { user } = useSelector((state) => state.auth); // Add this line to get current user
   const [showMenu, setShowMenu] = useState(null);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   const organizerEvents = events ? events.filter(event => event.organizer_id === user?.id) : [];
 
@@ -68,10 +70,13 @@ export default function OrganizerDashboard() {
                 <p className="text-sm text-gray-500">Manage your events</p>
               </div>
             </div>
-            <button className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg font-semibold hover:from-purple-700 hover:to-indigo-700 transition shadow-lg hover:shadow-xl transform hover:scale-105">
+            <Link
+              to={'/create-event'}
+              className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg font-semibold hover:from-purple-700 hover:to-indigo-700 transition shadow-lg hover:shadow-xl transform hover:scale-105"
+            >
               <Plus className="w-5 h-5" />
               Create Event
-            </button>
+            </Link>
           </div>
         </div>
       </header>
