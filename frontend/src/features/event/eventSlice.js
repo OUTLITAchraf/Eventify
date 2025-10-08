@@ -43,6 +43,20 @@ export const createEvent = createAsyncThunk(
   }
 );
 
+export const deleteEvent = createAsyncThunk(
+  "events/deleteEvent",
+  async (eventId, { rejectWithValue }) => {
+    try {
+      await api.delete(`/delete-event/${eventId}`);
+      return eventId;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data || "Failed to delete event"
+      );
+    }
+  }
+);
+
 const eventSlice = createSlice({
   name: "events",
   initialState: {
@@ -85,6 +99,25 @@ const eventSlice = createSlice({
         state.status = "failed";
         state.error = action.payload;
         console.error("Create Event rejected:", action.payload);
+      });
+    builder
+      .addCase(deleteEvent.pending, (state) => {
+        state.status = "loading";
+        state.error = null;
+        console.log("Delete Event pending");
+      })
+      .addCase(deleteEvent.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.events = state.events.filter(
+          (event) => event.id !== action.payload
+        );
+        state.error = null;
+        console.log("Event deleted:", action.payload);
+      })
+      .addCase(deleteEvent.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload;
+        console.error("Delete Event rejected:", action.payload);
       });
   },
 });
