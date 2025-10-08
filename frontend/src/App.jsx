@@ -8,6 +8,7 @@ import AuthLayout from './layouts/AuthLayout'
 import GuestLayout from './layouts/GuestLayout'
 import ProtectedRoute from './layouts/ProtectedRoute'
 import GuestRoute from './layouts/GuestRoute'
+import OrganizerDashboard from './pages/Organizer/OrganizerDashboard'
 
 function App() {
   return (
@@ -28,6 +29,7 @@ function App() {
           {/* Protected Routes */}
           <Route element={<ProtectedRoute />}>
             <Route element={<AuthLayout />}>
+              <Route path='/dashboard-organizer' element={<OrganizerDashboard />}/>
               <Route path='/profile' element={<DetailProfile />} />
             </Route>
           </Route>

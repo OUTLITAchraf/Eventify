@@ -50,11 +50,10 @@ class EventController extends Controller
             'start_time' => 'required|date',
             'end_time' => 'required|date|after_or_equal:start_time',
             'status' => 'required|in:scheduled,ongoing,completed',
-            'type' => 'required|in:OnPlatforme,OnStage',
+            'type' => 'required|in:Online,On Stage',
             'location' => 'nullable|string|max:255',
             'link' => 'nullable|url|max:255',
             'image' => 'nullable|string|max:255',
-            'category' => 'required|string|max:255',
         ]);
 
         $event = new Event($validated);
@@ -106,11 +105,10 @@ class EventController extends Controller
             'start_time' => 'sometimes|required|date',
             'end_time' => 'sometimes|required|date|after_or_equal:start_time',
             'status' => 'sometimes|required|in:scheduled,ongoing,completed',
-            'type' => 'sometimes|required|in:OnPlatforme,OnStage',
+            'type' => 'sometimes|required|in:Online,On Stage',
             'location' => 'sometimes|nullable|string|max:255',
             'link' => 'sometimes|nullable|url|max:255',
             'image' => 'sometimes|nullable|string|max:255',
-            'category' => 'sometimes|nullable|string|max:255',
         ]);
 
         $event->update(attributes: $validated);

@@ -18,11 +18,10 @@ return new class extends Migration
             $table->dateTime('start_time');
             $table->dateTime('end_time');
             $table->enum('status', ['scheduled', 'ongoing', 'completed'])->default('scheduled');
-            $table->enum('type',['OnPlatforme','OnStage']);
+            $table->enum('type',['Online', 'On Stage']);
             $table->string('location')->nullable();
             $table->string('link')->nullable();
             $table->string('image')->nullable();
-            $table->string('category');
             $table->foreignId('organizer_id')->constrained('users')->onDelete('cascade');
             $table->timestamps();
         });
