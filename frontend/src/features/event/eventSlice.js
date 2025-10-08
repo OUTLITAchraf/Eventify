@@ -69,6 +69,33 @@ export const fetchEventById = createAsyncThunk(
   }
 )
 
+export const updateEvent = createAsyncThunk(
+  "events/updateEvent",
+  async ({ id, eventData }, { rejectWithValue }) => {
+    try {
+      let response;
+      
+      if (eventData instanceof FormData) {
+        // If FormData (with image)
+        response = await api.post(`/update-event/${id}`, eventData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+      } else {
+        // If JSON data (without image)
+        response = await api.put(`/update-event/${id}`, eventData);
+      }
+
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data || 'Failed to update event'
+      );
+    }
+  }
+);
+
 const eventSlice = createSlice({
   name: "events",
   initialState: {
@@ -147,6 +174,27 @@ const eventSlice = createSlice({
         state.status = "failed";
         state.error = action.payload;
         console.error("fetchEventById rejected:", action.payload);
+      });
+    builder
+      .addCase(updateEvent.pending, (state) => {
+        state.status = "loading";
+        state.error = null;
+        console.log("Update Event pending");
+      })
+      .addCase(updateEvent.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        // Update both the events list and current event
+        state.events = state.events.map((event) =>
+          event.id === action.payload.id ? action.payload : event
+        );
+        state.currentEvent = action.payload;
+        state.error = null;
+        console.log("Event updated:", action.payload);
+      })
+      .addCase(updateEvent.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload;
+        console.error("Update Event rejected:", action.payload);
       });
   },
 });

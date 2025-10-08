@@ -267,7 +267,6 @@ export default function OrganizerDashboard() {
                   <div
                     key={event.id}
                     className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-xl transition-all transform hover:scale-105 cursor-pointer"
-                    onClick={() => handleEventClick(event.id)}
                   >
                     {/* Event Image */}
                     <div className="relative">
@@ -294,14 +293,21 @@ export default function OrganizerDashboard() {
                         </button>
                         {showMenu === event.id && (
                           <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border z-10">
-                            <button className="w-full px-4 py-3 text-left hover:bg-gray-50 flex items-center gap-3 text-gray-700 text-sm">
+                            <button
+                              onClick={() => handleEventClick(event.id)}
+                              className="w-full px-4 py-3 text-left hover:bg-gray-50 flex items-center gap-3 text-gray-700 text-sm"
+                            >
                               <Eye className="w-4 h-4" />
                               View Details
                             </button>
-                            <button className="w-full px-4 py-3 text-left hover:bg-gray-50 flex items-center gap-3 text-gray-700 text-sm">
+                            <Link
+                              to={`/update-event/${event.id}`}
+                              onClick={() => setShowMenu(null)}
+                              className="w-full px-4 py-3 text-left hover:bg-gray-50 flex items-center gap-3 text-gray-700 text-sm"
+                            >
                               <Edit className="w-4 h-4" />
                               Edit Event
-                            </button>
+                            </Link>
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();

@@ -11,6 +11,7 @@ import GuestRoute from './layouts/GuestRoute'
 import OrganizerDashboard from './pages/Organizer/OrganizerDashboard'
 import CreateEvent from "./pages/Organizer/CreateEvent"
 import DetailEvent from "./pages/Organizer/DetailEvent"
+import UpdateEvent from "./pages/Organizer/UpdateEvent"
 import { Toaster } from 'react-hot-toast'
 
 function App() {
@@ -37,6 +38,7 @@ function App() {
               <Route path='/profile' element={<DetailProfile />} />
               <Route path="/create-event" element={<CreateEvent />} />
               <Route path="/detail-event/:id" element={<DetailEvent />}/>
+              <Route path="/update-event/:id" element={<UpdateEvent />}/>
             </Route>
           </Route>
         </Routes>
