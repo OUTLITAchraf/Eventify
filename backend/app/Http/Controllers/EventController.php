@@ -71,7 +71,7 @@ class EventController extends Controller
      */
     public function show(Event $event)
     {
-        $event = Event::findOrFail($event->id);
+        $event = Event::findOrFail($event->id)->load('organizer');
 
         return response()->json([
             'message' => 'Event Fetched Successfully',

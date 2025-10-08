@@ -57,6 +57,18 @@ export const deleteEvent = createAsyncThunk(
   }
 );
 
+export const fetchEventById = createAsyncThunk(
+  'events/fetchEventById',
+  async (eventId, { rejectWithValue }) => {
+    try {
+      const response = await api.get(`/event/${eventId}`);
+      return response.data.event;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || 'Failed to fetch event details');
+    }
+  }
+)
+
 const eventSlice = createSlice({
   name: "events",
   initialState: {
@@ -118,6 +130,23 @@ const eventSlice = createSlice({
         state.status = "failed";
         state.error = action.payload;
         console.error("Delete Event rejected:", action.payload);
+      });
+    builder
+      .addCase(fetchEventById.pending, (state) => {
+        state.status = "loading";
+        state.error = null;
+        console.log("fetchEventById pending");
+      })
+      .addCase(fetchEventById.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.currentEvent = action.payload;
+        state.error = null;
+        console.log("Event detail fetched:", action.payload);
+      })
+      .addCase(fetchEventById.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload;
+        console.error("fetchEventById rejected:", action.payload);
       });
   },
 });

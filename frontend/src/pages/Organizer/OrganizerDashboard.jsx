@@ -24,11 +24,12 @@ import {
 } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchEvents, deleteEvent } from "../../features/event/eventSlice";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast"; // 💡 Added toast import
 
 export default function OrganizerDashboard() {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { events, status, error } = useSelector((state) => state.events);
   const { user } = useSelector((state) => state.auth);
   const [showMenu, setShowMenu] = useState(null);
@@ -180,6 +181,10 @@ export default function OrganizerDashboard() {
     </Transition>
   );
 
+  const handleEventClick = (eventId) => {
+    navigate(`/detail-event/${eventId}`);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header (No changes needed) */}
@@ -262,6 +267,7 @@ export default function OrganizerDashboard() {
                   <div
                     key={event.id}
                     className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-xl transition-all transform hover:scale-105 cursor-pointer"
+                    onClick={() => handleEventClick(event.id)}
                   >
                     {/* Event Image */}
                     <div className="relative">
