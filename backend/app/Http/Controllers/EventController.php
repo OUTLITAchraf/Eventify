@@ -50,7 +50,7 @@ class EventController extends Controller
             'start_time' => 'required|date',
             'end_time' => 'required|date|after_or_equal:start_time',
             'status' => 'required|in:scheduled,ongoing,completed',
-            'type' => 'required|in:Online,On Stage',
+            'type' => 'required|in:Online,OnStage',
             'location' => 'nullable|string|max:255',
             'link' => 'nullable|url|max:255',
             'image' => 'nullable|string|max:255',
@@ -71,7 +71,12 @@ class EventController extends Controller
      */
     public function show(Event $event)
     {
-        //
+        $event = Event::findOrFail($event->id);
+
+        return response()->json([
+            'message' => 'Event Fetched Successfully',
+            'event' => $event
+        ], 201);
     }
 
     /**

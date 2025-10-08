@@ -21,6 +21,7 @@ Route::middleware('api')->group(function () {
     Route::post('/register', [RegisteredUserController::class, 'store']);
     Route::post('/login', [AuthenticatedSessionController::class, 'store']);
     Route::get('/events',[EventController::class, 'index']);
+    Route::get('/event/{event}', [EventController::class, 'show']);
     
     // Protected routes
     Route::middleware('auth:sanctum')->group(function () {
