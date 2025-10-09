@@ -20,7 +20,14 @@ class DatabaseSeeder extends Seeder
         //     'password' => bcrypt('password'),
         // ]);
 
-        $this->call(LaratrustSeeder::class);
+        $this->call(
+            LaratrustSeeder::class,
+        );
+
+        $this->call(
+            CategorySeeder::class,
+        );
+
 
     }
 }

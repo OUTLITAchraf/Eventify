@@ -11,12 +11,13 @@ import {
   X,
   CheckCircle,
   Edit,
+  Folder as Category,
 } from "lucide-react";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
-import { updateEvent, fetchEventById } from "../../features/event/eventSlice";
+import { updateEvent, fetchEventById, fetchCategories} from "../../features/event/eventSlice";
 import { useNavigate, useParams } from "react-router-dom";
 import toast from 'react-hot-toast'; // 💡 Added toast import
 
@@ -41,6 +42,11 @@ const validationSchema = yup.object().shape({
     .min(yup.ref("start_time"), "End time must be after start time"),
   status: yup.string().oneOf(["scheduled", "ongoing", "completed"]).required(),
   type: yup.string().oneOf(["OnStage", "Online"]).required(),
+  category_id: yup
+    .number()
+    .required("Category is required")
+    .min(1, "Please select a category")
+    .typeError("Category must be a number"),
   location: yup.string().when("type", {
     is: "OnStage",
     then: (schema) =>
@@ -67,6 +73,7 @@ const defaultValues = {
   end_time: "",
   status: "scheduled",
   type: "OnStage",
+  category_id: 0,
   location: "",
   link: "",
   image: null,
@@ -86,7 +93,7 @@ export default function UpdateEventForm() {
   const { id } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { currentEvent: event, status, error: submitError } = useSelector(
+  const { currentEvent: event, categories, status, error: submitError } = useSelector(
     (state) => state.events
   );
   
@@ -111,6 +118,7 @@ export default function UpdateEventForm() {
   useEffect(() => {
     if (id) {
       dispatch(fetchEventById(id));
+      dispatch(fetchCategories());
     }
   }, [dispatch, id]);
 
@@ -125,6 +133,7 @@ export default function UpdateEventForm() {
         end_time: formatForInput(event.end_time),
         status: event.status || "scheduled",
         type: event.type || "OnStage",
+        category_id: event.category_id || 0,
         location: event.location || "",
         link: event.link || "",
         image: null,
@@ -180,6 +189,7 @@ export default function UpdateEventForm() {
                   : null,
                 status: data.status,
                 type: data.type,
+                category_id: data.category_id,
                 location: data.type === "OnStage" ? data.location : null,
                 link: data.type === "Online" ? data.link : null,
             };
@@ -253,6 +263,7 @@ export default function UpdateEventForm() {
             end_time: formatForInput(event.end_time),
             status: event.status || "scheduled",
             type: event.type || "OnStage",
+            category_id: event.category_id || 0,
             location: event.location || "",
             link: event.link || "",
             image: null,
@@ -510,6 +521,45 @@ export default function UpdateEventForm() {
                     )}
                   />
                   <ErrorMessage name="type" />
+                </div>
+
+                {/* Categorie Select */}
+                <div>
+                  <label
+                    htmlFor="category_id"
+                    className="block text-sm font-medium text-gray-700 mb-2"
+                  >
+                    Category <span className="text-red-500">*</span>
+                  </label>
+                  <Controller
+                    name="category_id"
+                    control={control}
+                    render={({ field }) => (
+                      <select
+                        {...field}
+                        // Ensure value is treated as a number
+                        onChange={(e) => field.onChange(parseInt(e.target.value))}
+                        id="category_id"
+                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent outline-none transition appearance-none bg-white cursor-pointer ${
+                          errors.category_id ? "border-red-500" : "border-gray-300"
+                        }`}
+                        // Value prop is set by React Hook Form's field.value
+                      >
+                        <option value={0} disabled>
+                          Select Category
+                        </option>
+                        {categories.map((category) => (
+                          <option 
+                            key={category.id} 
+                            value={category.id}
+                          >
+                            {category.display_name}
+                          </option>
+                        ))}
+                      </select>
+                    )}
+                  />
+                  <ErrorMessage name="category_id" />
                 </div>
               </div>
             </div>

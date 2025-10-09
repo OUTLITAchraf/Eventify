@@ -10,15 +10,14 @@ import {
   Tag,
   Upload,
   X,
-  CheckCircle,
 } from "lucide-react";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
-import { createEvent } from "../../features/event/eventSlice";
+import { createEvent, fetchCategories } from "../../features/event/eventSlice";
 import { useNavigate } from "react-router-dom";
-import toast from 'react-hot-toast'; 
+import toast from "react-hot-toast";
 
 const validationSchema = yup.object().shape({
   name: yup
@@ -40,6 +39,11 @@ const validationSchema = yup.object().shape({
     .min(yup.ref("start_time"), "End time must be after start time"),
   status: yup.string().oneOf(["scheduled", "ongoing", "completed"]).required(),
   type: yup.string().oneOf(["OnStage", "Online"]).required(),
+  category_id: yup
+    .number()
+    .required("Category is required")
+    .min(1, "Please select a category")
+    .typeError("Category must be a number"),
   location: yup.string().when("type", {
     is: "OnStage",
     then: (schema) =>
@@ -66,6 +70,7 @@ const defaultValues = {
   end_time: "",
   status: "scheduled",
   type: "OnStage",
+  category_id: 0,
   location: "",
   link: "",
   image: null,
@@ -75,14 +80,15 @@ export default function CreateEventForm() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { status, error: submitError } = useSelector((state) => state.events);
+  const { categories } = useSelector((state) => state.events);
   const [imagePreview, setImagePreview] = useState(null);
-  
+
   const {
     control,
     handleSubmit,
     reset,
-    watch, 
-    setValue, 
+    watch,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm({
     resolver: yupResolver(validationSchema),
@@ -91,6 +97,10 @@ export default function CreateEventForm() {
 
   const eventType = watch("type");
   const watchedImage = watch("image");
+
+  useEffect(() => {
+    dispatch(fetchCategories());
+  }, [dispatch]);
 
   const handleImageChange = useCallback(
     (e) => {
@@ -120,13 +130,20 @@ export default function CreateEventForm() {
           name: data.name,
           description: data.description,
           start_time: data.start_time
-            ? new Date(data.start_time).toISOString().slice(0, 19).replace("T", " ")
+            ? new Date(data.start_time)
+                .toISOString()
+                .slice(0, 19)
+                .replace("T", " ")
             : null,
           end_time: data.end_time
-            ? new Date(data.end_time).toISOString().slice(0, 19).replace("T", " ")
+            ? new Date(data.end_time)
+                .toISOString()
+                .slice(0, 19)
+                .replace("T", " ")
             : null,
           status: data.status,
           type: data.type,
+          category_id: data.category_id,
           location: data.type === "OnStage" ? data.location : null,
           link: data.type === "Online" ? data.link : null,
         };
@@ -147,7 +164,6 @@ export default function CreateEventForm() {
           // Append the image last
           formData.append("image", watchedImage);
           payload = formData;
-
         } else {
           // If no image, send JSON data directly
           payload = formattedData;
@@ -160,22 +176,22 @@ export default function CreateEventForm() {
         resolve();
 
         setTimeout(() => {
-            navigate("/dashboard-organizer");
-        }, 1000); 
-
+          navigate("/dashboard-organizer");
+        }, 1000);
       } catch (err) {
         console.error("Failed to create event:", err);
-        reject(err.message || "Failed to create event. Please check your inputs.");
+        reject(
+          err.message || "Failed to create event. Please check your inputs."
+        );
       }
     });
 
     toast.promise(createPromise, {
-      loading: 'Creating event...',
-      success: 'Event created successfully!',
-      error: (err) => `Error: ${err}`, 
+      loading: "Creating event...",
+      success: "Event created successfully!",
+      error: (err) => `Error: ${err}`,
     });
   };
-
 
   const ErrorMessage = useMemo(
     () =>
@@ -214,12 +230,10 @@ export default function CreateEventForm() {
       </header>
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-
         <form
           onSubmit={handleSubmit(onSubmit)}
           className="bg-white rounded-xl shadow-md p-8"
         >
-          
           <div className="space-y-8">
             <div>
               <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
@@ -414,6 +428,46 @@ export default function CreateEventForm() {
                   />
                   <ErrorMessage name="type" />
                 </div>
+
+                {/* Category Select */}
+                <div>
+                  <label
+                    htmlFor="category_id"
+                    className="block text-sm font-medium text-gray-700 mb-2"
+                  >
+                    Category <span className="text-red-500">*</span>
+                  </label>
+                  <Controller
+                    name="category_id"
+                    control={control}
+                    render={({ field }) => (
+                      <select
+                        {...field}
+                        // Convert value to number for validation
+                        onChange={(e) =>
+                          field.onChange(parseInt(e.target.value))
+                        }
+                        id="category_id"
+                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent outline-none transition appearance-none bg-white cursor-pointer ${
+                          errors.category_id
+                            ? "border-red-500"
+                            : "border-gray-300"
+                        }`}
+                      >
+                        <option value={0} disabled>
+                          Select Event Category
+                        </option>
+                        {/* Map over fetched categories */}
+                        {categories.map((category) => (
+                          <option key={category.id} value={category.id}>
+                            {category.display_name}
+                          </option>
+                        ))}
+                      </select>
+                    )}
+                  />
+                  <ErrorMessage name="category_id" />
+                </div>
               </div>
             </div>
 
@@ -560,14 +614,14 @@ export default function CreateEventForm() {
               <button
                 type="submit" // Crucial for form submission
                 // Disabled when submitting or when Redux status is 'loading'
-                disabled={isSubmitting || status === 'loading'}
+                disabled={isSubmitting || status === "loading"}
                 className={`flex-1 flex items-center justify-center gap-2 px-6 py-4 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg font-semibold transition shadow-lg transform hover:scale-105 ${
-                  (isSubmitting || status === 'loading')
+                  isSubmitting || status === "loading"
                     ? "opacity-50 cursor-not-allowed"
                     : "hover:from-purple-700 hover:to-indigo-700 hover:shadow-xl"
                 }`}
               >
-                {(isSubmitting || status === 'loading') ? (
+                {isSubmitting || status === "loading" ? (
                   "Creating..."
                 ) : (
                   <>

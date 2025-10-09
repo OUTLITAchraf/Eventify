@@ -47,6 +47,7 @@ class EventController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'required|string',
+            'category_id' => 'required|exists:categories,id',
             'start_time' => 'required|date',
             'end_time' => 'required|date|after_or_equal:start_time',
             'status' => 'required|in:scheduled,ongoing,completed',
@@ -71,7 +72,7 @@ class EventController extends Controller
      */
     public function show(Event $event)
     {
-        $event = Event::findOrFail($event->id)->load('organizer');
+        $event = Event::findOrFail($event->id)->load('organizer', 'category');
 
         return response()->json([
             'message' => 'Event Fetched Successfully',
@@ -107,10 +108,11 @@ class EventController extends Controller
         $validated = $request->validate([
             'name' => 'sometimes|required|string|max:255',
             'description' => 'sometimes|nullable|string',
+            'category_id' => 'sometimes|required|exists:categories,id',
             'start_time' => 'sometimes|required|date',
             'end_time' => 'sometimes|required|date|after_or_equal:start_time',
             'status' => 'sometimes|required|in:scheduled,ongoing,completed',
-            'type' => 'sometimes|required|in:Online,On Stage',
+            'type' => 'sometimes|required|in:Online,OnStage',
             'location' => 'sometimes|nullable|string|max:255',
             'link' => 'sometimes|nullable|url|max:255',
             'image' => 'sometimes|nullable|string|max:255',

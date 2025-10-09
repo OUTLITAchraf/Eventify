@@ -11,6 +11,7 @@ import {
   Building,
   ArrowLeft,
   Monitor,
+  Tag,
 } from "lucide-react";
 import { useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
@@ -100,7 +101,7 @@ export default function EventDetail() {
   };
 
   // Use the correct enum values from your schema (Assuming 'onplatform ' is correct from previous context)
-  const isOnline = event.type === "Online" || event.type === "onplatform ";
+  const isOnline = event.type === "Online" || event.type === "OnStage ";
 
   // Action button text change
   const actionText = isOnline ? "Join Event" : "View Location";
@@ -216,6 +217,18 @@ export default function EventDetail() {
 
             {/* 💡 REVISED Layout: Using space-y-4 to make them take full line, removing grid-cols-2 for this block */}
             <div className="space-y-4">
+              {/* Event Category */}
+              <div className="flex flex-col gap-1 border-b pb-4">
+                <div className="flex items-center gap-2">
+                  <Tag className="w-5 h-5 text-indigo-600 flex-shrink-0" />
+                  <p className="text-sm text-gray-500 font-medium">Category</p>
+                </div>
+                {/* Assumes event object includes a nested category object with a display_name */}
+                <p className="text-base font-semibold text-gray-800 ml-7">
+                  {event.category?.display_name || "Uncategorized"}
+                </p>
+              </div>
+
               {/* Event Type (Full Line) */}
               <div className="flex flex-col gap-1 border-b pb-4">
                 {" "}

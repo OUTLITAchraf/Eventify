@@ -1,14 +1,23 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
 import api from "../../services/api";
 
-const API_URL = "http://localhost:8000/api";
+export const fetchCategories = createAsyncThunk(
+  "events/fetchCategories",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await api.get("/categories");      
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || "Failed to fetch categories");
+    }
+  }
+);
 
 export const fetchEvents = createAsyncThunk(
   "events/fetchEvents",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`${API_URL}/events`);
+      const response = await api.get("/events");
       return response.data.events;
     } catch (error) {
       return rejectWithValue(error.response?.data || "Failed to fetch events");
@@ -21,24 +30,22 @@ export const createEvent = createAsyncThunk(
   async (eventData, { rejectWithValue }) => {
     try {
       let response;
-      
+
       if (eventData instanceof FormData) {
         // If FormData (with image)
-        response = await api.post('/create-event', eventData, {
+        response = await api.post("/create-event", eventData, {
           headers: {
-            'Content-Type': 'multipart/form-data',
+            "Content-Type": "multipart/form-data",
           },
         });
       } else {
         // If JSON data (without image)
-        response = await api.post('/create-event', eventData);
+        response = await api.post("/create-event", eventData);
       }
 
       return response.data;
     } catch (error) {
-      return rejectWithValue(
-        error.response?.data || 'Failed to create event'
-      );
+      return rejectWithValue(error.response?.data || "Failed to create event");
     }
   }
 );
@@ -50,36 +57,36 @@ export const deleteEvent = createAsyncThunk(
       await api.delete(`/delete-event/${eventId}`);
       return eventId;
     } catch (error) {
-      return rejectWithValue(
-        error.response?.data || "Failed to delete event"
-      );
+      return rejectWithValue(error.response?.data || "Failed to delete event");
     }
   }
 );
 
 export const fetchEventById = createAsyncThunk(
-  'events/fetchEventById',
+  "events/fetchEventById",
   async (eventId, { rejectWithValue }) => {
     try {
       const response = await api.get(`/event/${eventId}`);
       return response.data.event;
     } catch (error) {
-      return rejectWithValue(error.response?.data || 'Failed to fetch event details');
+      return rejectWithValue(
+        error.response?.data || "Failed to fetch event details"
+      );
     }
   }
-)
+);
 
 export const updateEvent = createAsyncThunk(
   "events/updateEvent",
   async ({ id, eventData }, { rejectWithValue }) => {
     try {
       let response;
-      
+
       if (eventData instanceof FormData) {
         // If FormData (with image)
         response = await api.post(`/update-event/${id}`, eventData, {
           headers: {
-            'Content-Type': 'multipart/form-data',
+            "Content-Type": "multipart/form-data",
           },
         });
       } else {
@@ -89,9 +96,7 @@ export const updateEvent = createAsyncThunk(
 
       return response.data;
     } catch (error) {
-      return rejectWithValue(
-        error.response?.data || 'Failed to update event'
-      );
+      return rejectWithValue(error.response?.data || "Failed to update event");
     }
   }
 );
@@ -100,6 +105,8 @@ const eventSlice = createSlice({
   name: "events",
   initialState: {
     events: [],
+    categories: [],
+    currentEvent: null,
     status: "idle",
     error: null,
   },
@@ -121,6 +128,23 @@ const eventSlice = createSlice({
         state.status = "failed";
         state.error = action.payload;
         console.error("fetchEvents rejected:", action.payload);
+      });
+    builder
+      .addCase(fetchCategories.pending, (state) => {
+        state.status = "loading";
+        state.error = null;
+        console.log("fetchCategories pending");
+      })
+      .addCase(fetchCategories.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.categories = action.payload;
+        state.error = null;
+        console.log("Fetched categories:", action.payload.categories);
+      })
+      .addCase(fetchCategories.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload;
+        console.error("fetchCategories rejected:", action.payload);
       });
     builder
       .addCase(createEvent.pending, (state) => {

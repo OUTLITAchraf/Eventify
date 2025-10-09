@@ -266,7 +266,7 @@ export default function OrganizerDashboard() {
                 return (
                   <div
                     key={event.id}
-                    className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-xl transition-all transform hover:scale-105 cursor-pointer"
+                    className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-xl transition-all transform hover:scale-105"
                   >
                     {/* Event Image */}
                     <div className="relative">
@@ -287,7 +287,7 @@ export default function OrganizerDashboard() {
                               showMenu === event.id ? null : event.id
                             );
                           }}
-                          className="p-2 bg-white rounded-full shadow-lg hover:bg-gray-100 transition"
+                          className="p-2 bg-white rounded-full shadow-lg hover:bg-gray-100 transition cursor-pointer"
                         >
                           <MoreVertical className="w-4 h-4 text-gray-600" />
                         </button>
@@ -295,7 +295,7 @@ export default function OrganizerDashboard() {
                           <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border z-10">
                             <button
                               onClick={() => handleEventClick(event.id)}
-                              className="w-full px-4 py-3 text-left hover:bg-gray-50 flex items-center gap-3 text-gray-700 text-sm"
+                              className="w-full px-4 py-3 text-left hover:bg-gray-50 flex items-center gap-3 text-gray-700 text-sm cursor-pointer"
                             >
                               <Eye className="w-4 h-4" />
                               View Details
@@ -303,7 +303,7 @@ export default function OrganizerDashboard() {
                             <Link
                               to={`/update-event/${event.id}`}
                               onClick={() => setShowMenu(null)}
-                              className="w-full px-4 py-3 text-left hover:bg-gray-50 flex items-center gap-3 text-gray-700 text-sm"
+                              className="w-full px-4 py-3 text-left hover:bg-gray-50 flex items-center gap-3 text-gray-700 text-sm cursor-pointer"
                             >
                               <Edit className="w-4 h-4" />
                               Edit Event
@@ -314,7 +314,7 @@ export default function OrganizerDashboard() {
                                 setEventToDelete(event);
                                 setDeleteModalOpen(true);
                               }}
-                              className="w-full px-4 py-3 text-left hover:bg-gray-50 flex items-center gap-3 text-red-600 border-t text-sm"
+                              className="w-full px-4 py-3 text-left hover:bg-gray-50 flex items-center gap-3 text-red-600 border-t text-sm cursor-pointer"
                             >
                               <Trash2 className="w-4 h-4" />
                               Delete Event
