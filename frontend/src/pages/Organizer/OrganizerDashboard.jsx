@@ -33,7 +33,6 @@ export default function OrganizerDashboard() {
   const { events, status, error } = useSelector((state) => state.events);
   const { user } = useSelector((state) => state.auth);
   const [showMenu, setShowMenu] = useState(null);
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [eventToDelete, setEventToDelete] = useState(null);
 

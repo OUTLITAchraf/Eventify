@@ -1,120 +1,124 @@
-import { useState } from 'react';
-import { Calendar, Search, MapPin, Clock, Users, Heart, Star, TrendingUp, Music, Briefcase, Palette, Dumbbell, Menu, X } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Calendar, Search, Building, Monitor, MapPin, ExternalLink, Clock } from 'lucide-react';
+import { fetchEvents, fetchCategories } from '../features/event/eventSlice';
 
 export default function HomePage() {
+  const dispatch = useDispatch();
+  const { events, categories, status, error } = useSelector((state) => state.events);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const categories = [
-    { id: 'all', name: 'All Events', icon: Calendar },
-    { id: 'music', name: 'Music', icon: Music },
-    { id: 'business', name: 'Business', icon: Briefcase },
-    { id: 'art', name: 'Art & Culture', icon: Palette },
-    { id: 'sports', name: 'Sports', icon: Dumbbell },
-  ];
+  useEffect(() => {
+    dispatch(fetchCategories());
+    dispatch(fetchEvents());
+  }, [dispatch]);
 
-  const featuredEvents = [
-    {
-      id: 1,
-      title: 'Summer Music Festival 2025',
-      date: 'Oct 15, 2025',
-      time: '6:00 PM',
-      location: 'Central Park, NY',
-      image: 'https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=800&h=500&fit=crop',
-      category: 'Music',
-      attendees: 1200,
-      price: 'From $45',
-      featured: true
-    },
-    {
-      id: 2,
-      title: 'Tech Innovation Summit',
-      date: 'Oct 20, 2025',
-      time: '9:00 AM',
-      location: 'Convention Center, SF',
-      image: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&h=500&fit=crop',
-      category: 'Business',
-      attendees: 850,
-      price: '$150',
-      featured: true
-    },
-    {
-      id: 3,
-      title: 'Art Gallery Opening',
-      date: 'Oct 18, 2025',
-      time: '7:00 PM',
-      location: 'Modern Art Museum',
-      image: 'https://images.unsplash.com/photo-1531058020387-3be344556be6?w=800&h=500&fit=crop',
-      category: 'Art',
-      attendees: 320,
-      price: 'Free',
-      featured: false
-    },
-  ];
+  const formatDate = (dateTimeString) => {
+    const date = new Date(dateTimeString);
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const month = months[date.getMonth()];
+    const day = date.getDate();
+    const year = date.getFullYear();
+    return `${month} ${day}, ${year}`;
+  };
 
-  const upcomingEvents = [
-    {
-      id: 4,
-      title: 'Marathon Championship',
-      date: 'Oct 25, 2025',
-      time: '7:00 AM',
-      location: 'City Stadium',
-      image: 'https://images.unsplash.com/photo-1452626038306-9aae5e071dd3?w=600&h=400&fit=crop',
-      category: 'Sports',
-      attendees: 500,
-      price: '$30'
-    },
-    {
-      id: 5,
-      title: 'Food & Wine Festival',
-      date: 'Nov 2, 2025',
-      time: '5:00 PM',
-      location: 'Harbor District',
-      image: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=600&h=400&fit=crop',
-      category: 'Music',
-      attendees: 680,
-      price: '$55'
-    },
-    {
-      id: 6,
-      title: 'Startup Pitch Night',
-      date: 'Nov 5, 2025',
-      time: '6:30 PM',
-      location: 'Innovation Hub',
-      image: 'https://images.unsplash.com/photo-1559136555-9303baea8ebd?w=600&h=400&fit=crop',
-      category: 'Business',
-      attendees: 200,
-      price: 'Free'
-    },
-    {
-      id: 7,
-      title: 'Jazz Night Live',
-      date: 'Nov 8, 2025',
-      time: '8:00 PM',
-      location: 'Blue Note Club',
-      image: 'https://images.unsplash.com/photo-1511192336575-5a79af67a629?w=600&h=400&fit=crop',
-      category: 'Music',
-      attendees: 150,
-      price: '$40'
-    },
-    {
-      id: 8,
-      title: 'Photography Workshop',
-      date: 'Nov 10, 2025',
-      time: '10:00 AM',
-      location: 'Creative Studio',
-      image: 'https://images.unsplash.com/photo-1542038784456-1ea8e935640e?w=600&h=400&fit=crop',
-      category: 'Art',
-      attendees: 45,
-      price: '$75'
-    },
-  ];
+  const formatTime = (dateTimeString) => {
+    const date = new Date(dateTimeString);
+    let hours = date.getHours();
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12 || 12;
+    return `${hours}:${minutes} ${ampm}`;
+  };
+
+  // Filter events by category and search (for main section)
+  const filteredEvents = events?.filter(event => {
+    const matchesSearch = event.name.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCategory = selectedCategory === 'all' || event.category_id === categories.find(cat => cat.name === selectedCategory)?.id;
+    return matchesSearch && matchesCategory;
+  }) || [];
+
+  // Get only scheduled events (separate section - not affected by category filter)
+  const scheduledEvents = events?.filter(event => event.status === 'scheduled') || [];
+
+    if (status === 'loading') {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+      </div>
+    );
+  }
+
+  if (status === 'failed') {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-red-600">
+          {error || 'Failed to load events'}
+        </div>
+      </div>
+    );
+  }
+
+  const EventCard = ({ event }) => (
+    <div className="bg-white rounded-xl overflow-hidden hover:shadow-2xl transition-all transform hover:scale-105 cursor-pointer border border-gray-200">
+      <div className="relative">
+        <img
+          src={event.image}
+          alt={event.name}
+          className="w-full h-48 object-cover"
+        />
+        <div className="absolute top-3 right-3">
+          {event.type === 'onstage' ? (
+            <span className="px-3 py-1 rounded-full text-xs font-semibold bg-white bg-opacity-90 text-blue-700 flex items-center gap-1 shadow-lg">
+              <Building className="w-3 h-3" />
+              On Stage
+            </span>
+          ) : (
+            <span className="px-3 py-1 rounded-full text-xs font-semibold bg-white bg-opacity-90 text-purple-700 flex items-center gap-1 shadow-lg">
+              <Monitor className="w-3 h-3" />
+              Online
+            </span>
+          )}
+        </div>
+      </div>
+
+      <div className="p-4">
+        <h3 className="text-lg font-bold text-gray-800 mb-3 line-clamp-2 min-h-14">
+          {event.name}
+        </h3>
+        
+        <div className="space-y-2">
+          <div className="flex items-center text-gray-600 text-sm">
+            <Calendar className="w-4 h-4 mr-2 text-purple-600 flex-shrink-0" />
+            <span>{formatDate(event.start_time)}</span>
+          </div>
+          
+          <div className="flex items-center text-gray-600 text-sm">
+            <Clock className="w-4 h-4 mr-2 text-purple-600 flex-shrink-0" />
+            <span>{formatTime(event.start_time)}</span>
+          </div>
+
+          {event.type === 'onstage' ? (
+            <div className="flex items-start text-gray-600 text-sm">
+              <MapPin className="w-4 h-4 mr-2 text-purple-600 flex-shrink-0 mt-0.5" />
+              <span className="line-clamp-1">{event.location}</span>
+            </div>
+          ) : (
+            <div className="flex items-center text-purple-600 text-sm">
+              <ExternalLink className="w-4 h-4 mr-2 flex-shrink-0" />
+              <span className="truncate hover:underline">Join Online</span>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
 
   return (
     <div className="min-h-screen bg-gray-50">
 
-      {/* Hero Section */}
+      {/* Hero Section with Search */}
       <section className="bg-gradient-to-br from-purple-600 via-purple-700 to-indigo-800 text-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto">
@@ -125,9 +129,8 @@ export default function HomePage() {
               Find and join thousands of amazing events happening around you
             </p>
 
-            {/* Search Bar */}
-            <div className="bg-white rounded-xl shadow-2xl p-2 flex flex-col md:flex-row gap-2">
-              <div className="flex-1 flex items-center px-4 py-2">
+            <div className="bg-white rounded-xl shadow-2xl p-2">
+              <div className="flex items-center px-4 py-2">
                 <Search className="w-5 h-5 text-gray-400 mr-3" />
                 <input
                   type="text"
@@ -137,154 +140,88 @@ export default function HomePage() {
                   className="flex-1 outline-none text-gray-700"
                 />
               </div>
-              <div className="flex items-center px-4 py-2 border-t md:border-t-0 md:border-l border-gray-200">
-                <MapPin className="w-5 h-5 text-gray-400 mr-3" />
-                <input
-                  type="text"
-                  placeholder="Location"
-                  className="flex-1 outline-none text-gray-700"
-                />
-              </div>
-              <button className="px-8 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg font-semibold hover:from-purple-700 hover:to-indigo-700 transition">
-                Search
-              </button>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Categories */}
       <section className="py-8 bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-4 overflow-x-auto pb-2">
-            {categories.map((category) => {
-              const Icon = category.icon;
-              return (
-                <button
-                  key={category.id}
-                  onClick={() => setSelectedCategory(category.id)}
-                  className={`flex items-center gap-2 px-6 py-3 rounded-lg font-medium whitespace-nowrap transition ${
-                    selectedCategory === category.id
-                      ? 'bg-purple-600 text-white shadow-lg'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
-                >
-                  <Icon className="w-5 h-5" />
-                  {category.name}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* Featured Events */}
-      <section className="py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between mb-8">
-            <div>
-              <h2 className="text-3xl font-bold text-gray-800 mb-2">Featured Events</h2>
-              <p className="text-gray-600">Don't miss these amazing upcoming events</p>
-            </div>
-            <TrendingUp className="w-8 h-8 text-purple-600" />
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {featuredEvents.map((event) => (
-              <div
-                key={event.id}
-                className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition transform hover:scale-105 cursor-pointer"
+            <button
+              onClick={() => setSelectedCategory('all')}
+              className={`px-6 py-3 rounded-lg font-medium whitespace-nowrap transition ${
+                selectedCategory === 'all'
+                  ? 'bg-purple-600 text-white shadow-lg'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              All Events
+            </button>
+            {categories?.map((category) => (
+              <button
+                key={category.id}
+                onClick={() => setSelectedCategory(category.name)}
+                className={`px-6 py-3 rounded-lg font-medium whitespace-nowrap transition ${
+                  selectedCategory === category.name
+                    ? 'bg-purple-600 text-white shadow-lg'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
               >
-                <div className="relative">
-                  <img
-                    src={event.image}
-                    alt={event.title}
-                    className="w-full h-48 object-cover"
-                  />
-                  {event.featured && (
-                    <div className="absolute top-4 right-4 bg-yellow-400 text-gray-900 px-3 py-1 rounded-full text-sm font-semibold flex items-center gap-1">
-                      <Star className="w-4 h-4 fill-current" />
-                      Featured
-                    </div>
-                  )}
-                  <button className="absolute top-4 left-4 bg-white rounded-full p-2 hover:bg-gray-100 transition">
-                    <Heart className="w-5 h-5 text-gray-600" />
-                  </button>
-                </div>
-                <div className="p-6">
-                  <div className="text-sm text-purple-600 font-semibold mb-2">{event.category}</div>
-                  <h3 className="text-xl font-bold text-gray-800 mb-3">{event.title}</h3>
-                  <div className="space-y-2 mb-4">
-                    <div className="flex items-center text-gray-600 text-sm">
-                      <Calendar className="w-4 h-4 mr-2" />
-                      {event.date}
-                    </div>
-                    <div className="flex items-center text-gray-600 text-sm">
-                      <Clock className="w-4 h-4 mr-2" />
-                      {event.time}
-                    </div>
-                    <div className="flex items-center text-gray-600 text-sm">
-                      <MapPin className="w-4 h-4 mr-2" />
-                      {event.location}
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between pt-4 border-t">
-                    <div className="flex items-center text-gray-600 text-sm">
-                      <Users className="w-4 h-4 mr-2" />
-                      {event.attendees} attending
-                    </div>
-                    <div className="text-purple-600 font-bold">{event.price}</div>
-                  </div>
-                </div>
-              </div>
+                {category.display_name}
+              </button>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Upcoming Events */}
-      <section className="py-16 bg-gray-100">
+      {/* Events By Category (filtered) */}
+      <section className="py-16 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-8">
-            <h2 className="text-3xl font-bold text-gray-800 mb-2">Upcoming Events</h2>
-            <p className="text-gray-600">More events you might love</p>
+            <h2 className="text-3xl font-bold text-gray-800 mb-2">
+              {selectedCategory === 'all' ? 'All Events' : categories.find(cat => cat.name === selectedCategory)?.display_name}
+            </h2>
+            <p className="text-gray-600">Browse events by category</p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {upcomingEvents.map((event) => (
-              <div
-                key={event.id}
-                className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition cursor-pointer"
-              >
-                <img
-                  src={event.image}
-                  alt={event.title}
-                  className="w-full h-40 object-cover"
-                />
-                <div className="p-4">
-                  <div className="text-xs text-purple-600 font-semibold mb-2">{event.category}</div>
-                  <h3 className="text-lg font-bold text-gray-800 mb-2 line-clamp-2">{event.title}</h3>
-                  <div className="space-y-1 mb-3">
-                    <div className="flex items-center text-gray-600 text-xs">
-                      <Calendar className="w-3 h-3 mr-2" />
-                      {event.date}
-                    </div>
-                    <div className="flex items-center text-gray-600 text-xs">
-                      <MapPin className="w-3 h-3 mr-2" />
-                      {event.location}
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between pt-3 border-t">
-                    <div className="text-purple-600 font-bold text-sm">{event.price}</div>
-                    <div className="flex items-center text-gray-500 text-xs">
-                      <Users className="w-3 h-3 mr-1" />
-                      {event.attendees}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
+          {filteredEvents.length === 0 ? (
+            <div className="text-center py-16">
+              <Calendar className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+              <h3 className="text-xl font-semibold text-gray-600 mb-2">No events found</h3>
+              <p className="text-gray-500">Try adjusting your search or filters</p>
+            </div>
+          ) : (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {filteredEvents.map((event) => (
+                <EventCard key={event.id} event={event} />
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* Scheduled Events Section (Fixed - Not affected by filters) */}
+      <section className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="mb-8">
+            <h2 className="text-3xl font-bold text-gray-800 mb-2">Scheduled Events</h2>
+            <p className="text-gray-600">Upcoming events you can register for</p>
           </div>
+
+          {scheduledEvents.length === 0 ? (
+            <div className="text-center py-16">
+              <Calendar className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+              <h3 className="text-xl font-semibold text-gray-600 mb-2">No scheduled events</h3>
+              <p className="text-gray-500">Check back later for upcoming events</p>
+            </div>
+          ) : (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {scheduledEvents.map((event) => (
+                <EventCard key={event.id} event={event} />
+              ))}
+            </div>
+          )}
         </div>
       </section>
 

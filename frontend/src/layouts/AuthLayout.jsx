@@ -58,9 +58,6 @@ function AuthLayout() {
 
                             {/* Desktop Menu */}
                             <div className="hidden md:flex items-center gap-8">
-                                <Link to="/" className="text-gray-700 hover:text-purple-600 font-medium transition">Events</Link>
-                                <Link to="#" className="text-gray-700 hover:text-purple-600 font-medium transition">Categories</Link>
-                                <Link to="#" className="text-gray-700 hover:text-purple-600 font-medium transition">About</Link>
                                 {user ? (
                                     <div className="relative" ref={dropdownRef}>
                                         <button

@@ -22,9 +22,6 @@ function GuestLayout() {
 
                             {/* Desktop Menu */}
                             <div className="hidden md:flex items-center gap-8">
-                                <a href="#" className="text-gray-700 hover:text-purple-600 font-medium transition">Events</a>
-                                <a href="#" className="text-gray-700 hover:text-purple-600 font-medium transition">Categories</a>
-                                <a href="#" className="text-gray-700 hover:text-purple-600 font-medium transition">About</a>
                                 <Link to={'/login'} className="px-6 py-2 text-purple-600 border-2 border-purple-600 rounded-lg font-semibold hover:bg-purple-50 transition">
                                     Sign In
                                 </Link>
