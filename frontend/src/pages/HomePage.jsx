@@ -1,6 +1,21 @@
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Calendar, Search, Building, Monitor, MapPin, ExternalLink, Clock } from 'lucide-react';
+import {
+  Calendar,
+  Search,
+  Building,
+  Monitor,
+  MapPin,
+  ExternalLink,
+  Clock,
+  Music,
+  Trophy,
+  Cpu,
+  Palette,
+  Briefcase,
+  Gamepad2,
+  Film,
+} from 'lucide-react';
 import { fetchEvents, fetchCategories } from '../features/event/eventSlice';
 
 export default function HomePage() {
@@ -41,6 +56,17 @@ export default function HomePage() {
 
   // Get only scheduled events (separate section - not affected by category filter)
   const scheduledEvents = events?.filter(event => event.status === 'scheduled') || [];
+
+  const categoryIcons = {
+    music: <Music className="w-4 h-4" />,
+    sports: <Trophy className="w-4 h-4" />,
+    technology: <Cpu className="w-4 h-4" />,
+    art: <Palette className="w-4 h-4" />,
+    business: <Briefcase className="w-4 h-4" />,
+    gaming: <Gamepad2 className="w-4 h-4" />,
+    film: <Film className="w-4 h-4" />,
+  };
+
 
     if (status === 'loading') {
     return (
@@ -147,10 +173,10 @@ export default function HomePage() {
 
       <section className="py-8 bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center gap-4 overflow-x-auto pb-2">
+          <div className="flex items-center gap-2 overflow-x-auto pb-2">
             <button
               onClick={() => setSelectedCategory('all')}
-              className={`px-6 py-3 rounded-lg font-medium whitespace-nowrap transition ${
+              className={`px-4 py-2 rounded-lg font-medium whitespace-nowrap transition ${
                 selectedCategory === 'all'
                   ? 'bg-purple-600 text-white shadow-lg'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -162,12 +188,13 @@ export default function HomePage() {
               <button
                 key={category.id}
                 onClick={() => setSelectedCategory(category.name)}
-                className={`px-6 py-3 rounded-lg font-medium whitespace-nowrap transition ${
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium whitespace-nowrap transition ${
                   selectedCategory === category.name
                     ? 'bg-purple-600 text-white shadow-lg'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
+                {categoryIcons[category.name]}
                 {category.display_name}
               </button>
             ))}
