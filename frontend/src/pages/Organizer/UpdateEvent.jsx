@@ -17,9 +17,48 @@ import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
-import { updateEvent, fetchEventById, fetchCategories} from "../../features/event/eventSlice";
+import {
+  updateEvent,
+  fetchEventById,
+  fetchCategories,
+} from "../../features/event/eventSlice";
 import { useNavigate, useParams } from "react-router-dom";
-import toast from 'react-hot-toast'; // 💡 Added toast import
+import toast from "react-hot-toast"; // 💡 Added toast import
+import axios from "axios";
+
+// --- CONFIGURATION: Use Vite Environment Variables ---
+// Ensure you have these variables in your .env file, prefixed with VITE_
+const CLOUDINARY_CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
+const CLOUDINARY_UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
+
+// --- CLOUDINARY UPLOAD FUNCTION (Reused from CreateEvent) ---
+const uploadToCloudinary = async (file) => {
+  if (!file) return null;
+
+  if (!CLOUDINARY_CLOUD_NAME || !CLOUDINARY_UPLOAD_PRESET) {
+    throw new Error(
+      "Cloudinary credentials are not set in the environment variables."
+    );
+  }
+
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
+
+  try {
+    const response = await axios.post(
+      `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`,
+      formData
+    );
+    // Return the secure URL provided by Cloudinary
+    return response.data.secure_url;
+  } catch (error) {
+    console.error("Cloudinary upload error:", error);
+    throw new Error(
+      "Failed to upload image. Check your Cloudinary configuration."
+    );
+  }
+};
 
 // --- VALIDATION SCHEMA ---
 const validationSchema = yup.object().shape({
@@ -63,7 +102,23 @@ const validationSchema = yup.object().shape({
         .required('Online Meeting Link is required for "On Platform" events'),
     otherwise: (schema) => schema.notRequired().transform(() => ""),
   }),
-  image: yup.mixed().nullable(), 
+  image: yup
+    .mixed()
+    .nullable() // Make it nullable for updates
+    .test("fileOrUrl", "Image must be a valid file or link", (value) => {
+      // If null, it's valid (removed image)
+      if (value === null) return true;
+      // If string, assume it's the existing URL and it's valid
+      if (typeof value === "string") return true;
+      // If File object, check size and type (for new upload)
+      if (value instanceof File) {
+        if (value.size > 10485760) return false; // 10MB limit
+        if (!["image/jpeg", "image/png", "image/gif"].includes(value.type))
+          return false;
+        return true;
+      }
+      return false; // Should not happen
+    }),
 });
 
 const defaultValues = {
@@ -79,24 +134,27 @@ const defaultValues = {
   image: null,
 };
 
-
 // Helper to format ISO date string for datetime-local input
 const formatForInput = (isoDateString) => {
-    if (!isoDateString) return '';
-    const date = new Date(isoDateString);
-    // Format to YYYY-MM-DDTHH:mm
-    return new Date(date.getTime() - (date.getTimezoneOffset() * 60000)).toISOString().slice(0, 16);
+  if (!isoDateString) return "";
+  const date = new Date(isoDateString);
+  // Format to YYYY-MM-DDTHH:mm
+  return new Date(date.getTime() - date.getTimezoneOffset() * 60000)
+    .toISOString()
+    .slice(0, 16);
 };
-
 
 export default function UpdateEventForm() {
   const { id } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { currentEvent: event, categories, status, error: submitError } = useSelector(
-    (state) => state.events
-  );
-  
+  const {
+    currentEvent: event,
+    categories,
+    status,
+    error: submitError,
+  } = useSelector((state) => state.events);
+
   const [imagePreview, setImagePreview] = useState(null);
 
   const {
@@ -108,12 +166,10 @@ export default function UpdateEventForm() {
     formState: { errors, isSubmitting },
   } = useForm({
     resolver: yupResolver(validationSchema),
-    defaultValues: defaultValues,
   });
 
   const eventType = watch("type");
-  const watchedImage = watch("image");
-  
+
   // --- 1. FETCH AND POPULATE EVENT DATA ---
   useEffect(() => {
     if (id) {
@@ -124,6 +180,7 @@ export default function UpdateEventForm() {
 
   useEffect(() => {
     if (event && event.id === parseInt(id)) {
+      setValue("image", event.image || null);
       setImagePreview(event.image);
 
       reset({
@@ -136,27 +193,27 @@ export default function UpdateEventForm() {
         category_id: event.category_id || 0,
         location: event.location || "",
         link: event.link || "",
-        image: null,
       });
-      
+
       if (event.type === "OnStage") {
-          setValue('link', '');
+        setValue("link", "");
       } else {
-          setValue('location', '');
+        setValue("location", "");
       }
     }
   }, [event, id, reset, setValue]);
-
 
   // --- IMAGE HANDLERS ---
   const handleImageChange = useCallback(
     (e) => {
       const file = e.target.files[0];
       if (file) {
+        // 💡 Set the value to the File object (which triggers upload later)
         setValue("image", file, { shouldValidate: true });
 
         const reader = new FileReader();
         reader.onloadend = () => {
+          // Set the preview to the local blob URL
           setImagePreview(reader.result);
         };
         reader.readAsDataURL(file);
@@ -167,80 +224,86 @@ export default function UpdateEventForm() {
 
   const removeImage = useCallback(() => {
     // Set a flag value to signal removal to the backend
-    setValue("image", "REMOVE_IMAGE_FLAG", { shouldValidate: true }); 
+    setValue("image", "REMOVE_IMAGE_FLAG", { shouldValidate: true });
     setImagePreview(null);
   }, [setValue]);
 
-
   // --- SUBMISSION HANDLER (Implemented with toast.promise) ---
   const onSubmit = async (data) => {
-    
     // 💡 Create the promise function that handles the dispatch logic
     const updatePromise = new Promise(async (resolve, reject) => {
-        try {
-            const formattedData = {
-                name: data.name,
-                description: data.description,
-                start_time: data.start_time
-                  ? new Date(data.start_time).toISOString().slice(0, 19).replace("T", " ")
-                  : null,
-                end_time: data.end_time
-                  ? new Date(data.end_time).toISOString().slice(0, 19).replace("T", " ")
-                  : null,
-                status: data.status,
-                type: data.type,
-                category_id: data.category_id,
-                location: data.type === "OnStage" ? data.location : null,
-                link: data.type === "Online" ? data.link : null,
-            };
+      let finalImageUrl = data.image; // Start with the value in the form (URL string, File object, or null)
 
-            const formData = new FormData();
-            let hasImageUpdate = false;
-
-            // Append all data to FormData
-            Object.keys(formattedData).forEach((key) => {
-                if (formattedData[key] !== null) {
-                    formData.append(key, formattedData[key]);
-                }
-            });
-            
-            // Handle image update/removal logic
-            if (watchedImage === "REMOVE_IMAGE_FLAG") {
-                formData.append("image", "REMOVE_IMAGE_FLAG"); // Instruct backend to delete
-                hasImageUpdate = true;
-            } else if (watchedImage instanceof File) {
-                formData.append("image", watchedImage); // New file upload
-                hasImageUpdate = true;
-            }
-            
-            // Dispatch update event
-            if (hasImageUpdate) {
-                await dispatch(updateEvent({ id, eventData: formData, isFormData: true })).unwrap();
-            } else {
-                await dispatch(updateEvent({ id, eventData: formattedData })).unwrap();
-            }
-
-            // Success: Resolve the promise
-            resolve();
-            
-        } catch (err) {
-            // Error: Reject the promise with the error message
-            console.error("Update failed:", err);
-            reject(err.message || "The event update failed due to a server error.");
+      try {
+        if (data.image instanceof File) {
+          // If it's a new file, upload it to Cloudinary
+          toast.loading("Uploading new image...", { id: "image-upload" });
+          finalImageUrl = await uploadToCloudinary(data.image);
+          toast.success("Image uploaded successfully!", { id: "image-upload" });
         }
+
+        const formattedData = {
+          name: data.name,
+          description: data.description,
+          start_time: data.start_time
+            ? new Date(data.start_time)
+                .toISOString()
+                .slice(0, 19)
+                .replace("T", " ")
+            : null,
+          end_time: data.end_time
+            ? new Date(data.end_time)
+                .toISOString()
+                .slice(0, 19)
+                .replace("T", " ")
+            : null,
+          status: data.status,
+          type: data.type,
+          category_id: data.category_id,
+          location: data.type === "OnStage" ? data.location : null,
+          link: data.type === "Online" ? data.link : null,
+          image: finalImageUrl,
+        };
+
+        // 4. Dispatch the event update thunk
+        const result = await dispatch(
+          updateEvent({ id, eventData: formattedData })
+        ).unwrap();
+
+        // Success: Resolve the promise
+        resolve(result);
+      } catch (err) {
+        // Error: Reject the promise
+        console.error("Update failed:", err);
+        toast.dismiss("image-upload"); // Dismiss any lingering image upload toast
+        const errorMessage =
+          err.message ||
+          err.response?.data?.message ||
+          err.response?.data?.error ||
+          "The event update failed due to a server error.";
+        reject(new Error(errorMessage));
+      }
     });
 
     // 💡 Use toast.promise to display feedback
-    await toast.promise(updatePromise, {
-        loading: `Updating "${event.name}"...`,
-        success: `${event.name} updated successfully!`,
-        error: (err) => `Error: ${err}`,
-    });
-    
-    // Redirect after success (or user closes toast)
-    navigate(`/dashboard-organizer`);
+    // Use toast.promise to display feedback for the overall event update
+    await toast
+      .promise(updatePromise, {
+        loading: "Updating event...",
+        success: (updated_event) =>
+          `Event "${updated_event.name}" updated successfully!`,
+        error: (err) => `Error: ${err.message}`,
+      })
+      .then(() => {
+        // Redirect to the event detail page
+        navigate(`/dashboard-organizer`);
+      })
+      .catch((err) => {
+        // Handle final catch if needed
+        console.log('Error after toast:', err);
+        
+      });
   };
-
 
   // --- UI HELPERS ---
   const ErrorMessage = useMemo(
@@ -256,36 +319,36 @@ export default function UpdateEventForm() {
 
   const handleReset = useCallback(() => {
     if (event) {
-        reset({
-            name: event.name || "",
-            description: event.description || "",
-            start_time: formatForInput(event.start_time),
-            end_time: formatForInput(event.end_time),
-            status: event.status || "scheduled",
-            type: event.type || "OnStage",
-            category_id: event.category_id || 0,
-            location: event.location || "",
-            link: event.link || "",
-            image: null,
-        });
-        setImagePreview(event.image || null);
+      reset({
+        name: event.name || "",
+        description: event.description || "",
+        start_time: formatForInput(event.start_time),
+        end_time: formatForInput(event.end_time),
+        status: event.status || "scheduled",
+        type: event.type || "OnStage",
+        category_id: event.category_id || 0,
+        location: event.location || "",
+        link: event.link || "",
+        image: null,
+      });
+      setImagePreview(event.image || null);
     } else {
-        reset(defaultValues);
-        setImagePreview(null);
+      reset(defaultValues);
+      setImagePreview(null);
     }
   }, [reset, event]);
 
   // --- LOADING/ERROR STATES ---
-  if (status === 'loading' && !event) {
-      return (
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
-            <p className="ml-4 text-gray-600">Loading event details...</p>
-        </div>
-      );
+  if (status === "loading" && !event) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+        <p className="ml-4 text-gray-600">Loading event details...</p>
+      </div>
+    );
   }
-  
-  if (status === 'failed' && !event) {
+
+  if (status === "failed" && !event) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="bg-red-50 text-red-600 p-4 rounded-md">
@@ -296,10 +359,11 @@ export default function UpdateEventForm() {
   }
 
   if (!event || event.id !== parseInt(id)) {
-    return <div className="text-center p-10">Event not found or loading issue.</div>;
+    return (
+      <div className="text-center p-10">Event not found or loading issue.</div>
+    );
   }
-  
-  
+
   // --- FORM RENDER ---
   return (
     <div className="min-h-screen bg-gray-50">
@@ -514,9 +578,7 @@ export default function UpdateEventForm() {
                         <option value="OnStage">
                           On Stage (Physical Event)
                         </option>
-                        <option value="Online">
-                          Online (Online Event)
-                        </option>
+                        <option value="Online">Online (Online Event)</option>
                       </select>
                     )}
                   />
@@ -538,10 +600,14 @@ export default function UpdateEventForm() {
                       <select
                         {...field}
                         // Ensure value is treated as a number
-                        onChange={(e) => field.onChange(parseInt(e.target.value))}
+                        onChange={(e) =>
+                          field.onChange(parseInt(e.target.value))
+                        }
                         id="category_id"
                         className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent outline-none transition appearance-none bg-white cursor-pointer ${
-                          errors.category_id ? "border-red-500" : "border-gray-300"
+                          errors.category_id
+                            ? "border-red-500"
+                            : "border-gray-300"
                         }`}
                         // Value prop is set by React Hook Form's field.value
                       >
@@ -549,10 +615,7 @@ export default function UpdateEventForm() {
                           Select Category
                         </option>
                         {categories.map((category) => (
-                          <option 
-                            key={category.id} 
-                            value={category.id}
-                          >
+                          <option key={category.id} value={category.id}>
                             {category.display_name}
                           </option>
                         ))}

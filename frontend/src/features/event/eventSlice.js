@@ -27,25 +27,18 @@ export const fetchEvents = createAsyncThunk(
 
 export const createEvent = createAsyncThunk(
   "events/createEvent",
+  // eventData will now be a JSON object containing the Cloudinary URL as 'image'
   async (eventData, { rejectWithValue }) => {
     try {
-      let response;
-
-      if (eventData instanceof FormData) {
-        // If FormData (with image)
-        response = await api.post("/create-event", eventData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        });
-      } else {
-        // If JSON data (without image)
-        response = await api.post("/create-event", eventData);
-      }
-
-      return response.data;
+      // 💡 Send JSON data. The image is now a URL in the payload.
+      const response = await api.post("/create-event", eventData); 
+      
+      return response.data.event; // Assuming the controller returns { event: <data> }
     } catch (error) {
-      return rejectWithValue(error.response?.data || "Failed to create event");
+      // Improved error handling to extract message
+      return rejectWithValue(
+        error.response?.data?.message || error.response?.data?.error || "Failed to create event"
+      );
     }
   }
 );
@@ -76,27 +69,21 @@ export const fetchEventById = createAsyncThunk(
   }
 );
 
+// 💡 Update Event Thunk
 export const updateEvent = createAsyncThunk(
   "events/updateEvent",
+  // eventData is a JSON object with the image URL (or null)
   async ({ id, eventData }, { rejectWithValue }) => {
     try {
-      let response;
-
-      if (eventData instanceof FormData) {
-        // If FormData (with image)
-        response = await api.post(`/update-event/${id}`, eventData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        });
-      } else {
-        // If JSON data (without image)
-        response = await api.put(`/update-event/${id}`, eventData);
-      }
-
-      return response.data;
+      // 💡 Use api.put for updates and send the JSON payload
+      const response = await api.put(`/update-event/${id}`, eventData); 
+      
+      return response.data.event; // Assuming the controller returns { event: <data> }
     } catch (error) {
-      return rejectWithValue(error.response?.data || "Failed to update event");
+      // Improved error handling to extract message
+      return rejectWithValue(
+        error.response?.data?.message || error.response?.data?.error || "Failed to update event"
+      );
     }
   }
 );

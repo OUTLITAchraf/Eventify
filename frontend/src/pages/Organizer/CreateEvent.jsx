@@ -10,6 +10,7 @@ import {
   Tag,
   Upload,
   X,
+  Folder as Category,
 } from "lucide-react";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -18,6 +19,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { createEvent, fetchCategories } from "../../features/event/eventSlice";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import axios from "axios";
+
+const CLOUDINARY_CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
+const CLOUDINARY_UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
 
 const validationSchema = yup.object().shape({
   name: yup
@@ -60,7 +65,18 @@ const validationSchema = yup.object().shape({
         .required('Online Meeting Link is required for "On Platform" events'),
     otherwise: (schema) => schema.notRequired().transform(() => ""),
   }),
-  image: yup.mixed().nullable(),
+  image: yup
+    .mixed()
+    .required("An event image is required")
+    .test("fileSize", "File size is too large (max 10MB)", (value) => {
+      // Allow if null (if nullable schema was used), but here it's required
+      return !value || value.size <= 10485760;
+    })
+    .test("fileType", "Unsupported file type", (value) => {
+      return (
+        !value || ["image/jpeg", "image/png", "image/gif"].includes(value.type)
+      );
+    }),
 });
 
 const defaultValues = {
@@ -74,6 +90,36 @@ const defaultValues = {
   location: "",
   link: "",
   image: null,
+};
+
+// --- CLOUDINARY UPLOAD FUNCTION (UPDATED) ---
+const uploadToCloudinary = async (file) => {
+  if (!file) return null;
+
+  if (!CLOUDINARY_CLOUD_NAME || !CLOUDINARY_UPLOAD_PRESET) {
+    throw new Error(
+      "Cloudinary credentials are not set in the environment variables."
+    );
+  }
+
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
+
+  try {
+    const response = await axios.post(
+      `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`,
+      formData
+    );
+    // Return the secure URL provided by Cloudinary
+    return response.data.secure_url;
+  } catch (error) {
+    console.error("Cloudinary upload error:", error);
+    // Provide a more user-friendly error
+    throw new Error(
+      "Failed to upload image. Check your Cloudinary configuration."
+    );
+  }
 };
 
 export default function CreateEventForm() {
@@ -96,12 +142,12 @@ export default function CreateEventForm() {
   });
 
   const eventType = watch("type");
-  const watchedImage = watch("image");
 
   useEffect(() => {
     dispatch(fetchCategories());
   }, [dispatch]);
 
+  // --- IMAGE HANDLERS ---
   const handleImageChange = useCallback(
     (e) => {
       const file = e.target.files[0];
@@ -125,7 +171,21 @@ export default function CreateEventForm() {
 
   const onSubmit = async (data) => {
     const createPromise = new Promise(async (resolve, reject) => {
+      let imageUrl = null;
+
       try {
+        // 1. Upload image to Cloudinary first
+        if (data.image) {
+          // Show loading message specific to image upload
+          toast.loading("Uploading image...", { id: "image-upload" });
+          imageUrl = await uploadToCloudinary(data.image);
+          toast.success("Image uploaded successfully!", { id: "image-upload" });
+        } else {
+          // This shouldn't happen if validation is correct, but as a fallback
+          reject(new Error("Image data is missing."));
+          return;
+        }
+
         const formattedData = {
           name: data.name,
           description: data.description,
@@ -146,51 +206,42 @@ export default function CreateEventForm() {
           category_id: data.category_id,
           location: data.type === "OnStage" ? data.location : null,
           link: data.type === "Online" ? data.link : null,
+          image: imageUrl,
         };
 
-        let payload;
+        // 3. Dispatch the event creation thunk (using JSON payload)
+        const result = await dispatch(createEvent(formattedData)).unwrap();
 
-        // If there's an image, use FormData
-        if (watchedImage) {
-          const formData = new FormData();
-
-          // Append all data to FormData
-          Object.keys(formattedData).forEach((key) => {
-            if (formattedData[key] !== null) {
-              formData.append(key, formattedData[key]);
-            }
-          });
-
-          // Append the image last
-          formData.append("image", watchedImage);
-          payload = formData;
-        } else {
-          // If no image, send JSON data directly
-          payload = formattedData;
-        }
-
-        // Dispatch the async thunk
-        await dispatch(createEvent(payload)).unwrap();
-
-        // Resolve the promise on success
-        resolve();
-
-        setTimeout(() => {
-          navigate("/dashboard-organizer");
-        }, 1000);
+        // Success: Resolve the promise with the new event data
+        resolve(result);
       } catch (err) {
-        console.error("Failed to create event:", err);
-        reject(
-          err.message || "Failed to create event. Please check your inputs."
-        );
+        // Error: Reject the promise with the error message
+        console.error("Creation failed:", err);
+        // Clear any lingering image upload toast if the dispatch failed later
+        toast.dismiss("image-upload");
+        const errorMessage =
+          err.message ||
+          err.response?.data?.message ||
+          err.response?.data?.error ||
+          "The event creation failed due to a server error.";
+        reject(new Error(errorMessage));
       }
     });
 
-    toast.promise(createPromise, {
-      loading: "Creating event...",
-      success: "Event created successfully!",
-      error: (err) => `Error: ${err}`,
-    });
+    // Use toast.promise to display feedback for the overall event creation
+    await toast
+      .promise(createPromise, {
+        loading: "Creating event...",
+        success: (new_event) =>
+          `Event "${new_event.name}" created successfully!`,
+        error: (err) => `Error: ${err.message}`, // Use err.message from the rejected promise
+      })
+      .then((new_event) => {
+        // Redirect to the new event detail page
+        navigate(`/dashboard-organizer`);
+      }).catch((err) => {
+        console.log("Event creation error :", err);
+      });
   };
 
   const ErrorMessage = useMemo(
