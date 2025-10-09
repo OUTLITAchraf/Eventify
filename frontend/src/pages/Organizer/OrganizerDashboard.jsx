@@ -181,7 +181,7 @@ export default function OrganizerDashboard() {
   );
 
   const handleEventClick = (eventId) => {
-    navigate(`/detail-event/${eventId}`);
+    navigate(`/organizer/detail-event/${eventId}`);
   };
 
   return (
@@ -202,7 +202,7 @@ export default function OrganizerDashboard() {
               </div>
             </div>
             <Link
-              to={"/create-event"}
+              to={"/organizer/create-event"}
               className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg font-semibold hover:from-purple-700 hover:to-indigo-700 transition shadow-lg hover:shadow-xl transform hover:scale-105"
             >
               <Plus className="w-5 h-5" />
@@ -300,7 +300,7 @@ export default function OrganizerDashboard() {
                               View Details
                             </button>
                             <Link
-                              to={`/update-event/${event.id}`}
+                              to={`/organizer/update-event/${event.id}`}
                               onClick={() => setShowMenu(null)}
                               className="w-full px-4 py-3 text-left hover:bg-gray-50 flex items-center gap-3 text-gray-700 text-sm cursor-pointer"
                             >

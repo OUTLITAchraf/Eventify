@@ -152,7 +152,7 @@ export default function EventDetail() {
             {/* Action Buttons (Reintroduced) */}
             <div className="flex gap-4">
               <Link
-                to="/dashboard-organizer"
+                to="/organizer/dashboard"
                 className="flex items-center gap-2 px-5 py-3 border border-white text-white rounded-lg font-semibold hover:bg-white hover:text-gray-900 transition"
               >
                 <ArrowLeft className="w-5 h-5" />

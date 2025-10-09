@@ -238,7 +238,7 @@ export default function CreateEventForm() {
       })
       .then((new_event) => {
         // Redirect to the new event detail page
-        navigate(`/dashboard-organizer`);
+        navigate(`/organizer/dashboard`);
       }).catch((err) => {
         console.log("Event creation error :", err);
       });

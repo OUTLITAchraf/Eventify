@@ -22,11 +22,8 @@ function GuestLayout() {
 
                             {/* Desktop Menu */}
                             <div className="hidden md:flex items-center gap-8">
-                                <Link to={'/login'} className="px-6 py-2 text-purple-600 border-2 border-purple-600 rounded-lg font-semibold hover:bg-purple-50 transition">
-                                    Sign In
-                                </Link>
                                 <Link to={'/register'} className="px-6 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg font-semibold hover:from-purple-700 hover:to-indigo-700 transition">
-                                    Sign Up
+                                    Sign Up As Organizer
                                 </Link>
                             </div>
 

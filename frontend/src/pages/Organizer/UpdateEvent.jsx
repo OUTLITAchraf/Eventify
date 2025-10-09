@@ -296,7 +296,7 @@ export default function UpdateEventForm() {
       })
       .then(() => {
         // Redirect to the event detail page
-        navigate(`/dashboard-organizer`);
+        navigate(`/organizer/dashboard`);
       })
       .catch((err) => {
         // Handle final catch if needed

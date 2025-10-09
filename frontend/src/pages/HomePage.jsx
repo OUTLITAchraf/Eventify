@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import {
   Calendar,
   Search,
@@ -15,14 +15,17 @@ import {
   Briefcase,
   Gamepad2,
   Film,
-} from 'lucide-react';
-import { fetchEvents, fetchCategories } from '../features/event/eventSlice';
+} from "lucide-react";
+import { fetchEvents, fetchCategories } from "../features/event/eventSlice";
+import { Link } from "react-router-dom";
 
 export default function HomePage() {
   const dispatch = useDispatch();
-  const { events, categories, status, error } = useSelector((state) => state.events);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('all');
+  const { events, categories, status, error } = useSelector(
+    (state) => state.events
+  );
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("all");
 
   useEffect(() => {
     dispatch(fetchCategories());
@@ -31,7 +34,20 @@ export default function HomePage() {
 
   const formatDate = (dateTimeString) => {
     const date = new Date(dateTimeString);
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const months = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
     const month = months[date.getMonth()];
     const day = date.getDate();
     const year = date.getFullYear();
@@ -41,21 +57,28 @@ export default function HomePage() {
   const formatTime = (dateTimeString) => {
     const date = new Date(dateTimeString);
     let hours = date.getHours();
-    const minutes = date.getMinutes().toString().padStart(2, '0');
-    const ampm = hours >= 12 ? 'PM' : 'AM';
+    const minutes = date.getMinutes().toString().padStart(2, "0");
+    const ampm = hours >= 12 ? "PM" : "AM";
     hours = hours % 12 || 12;
     return `${hours}:${minutes} ${ampm}`;
   };
 
   // Filter events by category and search (for main section)
-  const filteredEvents = events?.filter(event => {
-    const matchesSearch = event.name.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = selectedCategory === 'all' || event.category_id === categories.find(cat => cat.name === selectedCategory)?.id;
-    return matchesSearch && matchesCategory;
-  }) || [];
+  const filteredEvents =
+    events?.filter((event) => {
+      const matchesSearch = event.name
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase());
+      const matchesCategory =
+        selectedCategory === "all" ||
+        event.category_id ===
+          categories.find((cat) => cat.name === selectedCategory)?.id;
+      return matchesSearch && matchesCategory;
+    }) || [];
 
   // Get only scheduled events (separate section - not affected by category filter)
-  const scheduledEvents = events?.filter(event => event.status === 'scheduled') || [];
+  const scheduledEvents =
+    events?.filter((event) => event.status === "scheduled") || [];
 
   const categoryIcons = {
     music: <Music className="w-4 h-4" />,
@@ -67,8 +90,7 @@ export default function HomePage() {
     film: <Film className="w-4 h-4" />,
   };
 
-
-    if (status === 'loading') {
+  if (status === "loading") {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
@@ -76,12 +98,10 @@ export default function HomePage() {
     );
   }
 
-  if (status === 'failed') {
+  if (status === "failed") {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-red-600">
-          {error || 'Failed to load events'}
-        </div>
+        <div className="text-red-600">{error || "Failed to load events"}</div>
       </div>
     );
   }
@@ -95,7 +115,7 @@ export default function HomePage() {
           className="w-full h-48 object-cover"
         />
         <div className="absolute top-3 right-3">
-          {event.type === 'OnStage' ? (
+          {event.type === "OnStage" ? (
             <span className="px-3 py-1 rounded-full text-xs font-semibold bg-white bg-opacity-90 text-blue-700 flex items-center gap-1 shadow-lg">
               <Building className="w-3 h-3" />
               On Stage
@@ -113,19 +133,19 @@ export default function HomePage() {
         <h3 className="text-lg font-bold text-gray-800 mb-3 line-clamp-2 min-h-14">
           {event.name}
         </h3>
-        
+
         <div className="space-y-2">
           <div className="flex items-center text-gray-600 text-sm">
             <Calendar className="w-4 h-4 mr-2 text-purple-600 flex-shrink-0" />
             <span>{formatDate(event.start_time)}</span>
           </div>
-          
+
           <div className="flex items-center text-gray-600 text-sm">
             <Clock className="w-4 h-4 mr-2 text-purple-600 flex-shrink-0" />
             <span>{formatTime(event.start_time)}</span>
           </div>
 
-          {event.type === 'OnStage' ? (
+          {event.type === "OnStage" ? (
             <div className="flex items-start text-gray-600 text-sm">
               <MapPin className="w-4 h-4 mr-2 text-purple-600 flex-shrink-0 mt-0.5" />
               <span className="line-clamp-1">{event.location}</span>
@@ -143,7 +163,6 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-
       {/* Hero Section with Search */}
       <section className="bg-gradient-to-br from-purple-600 via-purple-700 to-indigo-800 text-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -175,11 +194,11 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-2 overflow-x-auto pb-2">
             <button
-              onClick={() => setSelectedCategory('all')}
+              onClick={() => setSelectedCategory("all")}
               className={`px-4 py-2 rounded-lg font-medium whitespace-nowrap transition ${
-                selectedCategory === 'all'
-                  ? 'bg-purple-600 text-white shadow-lg'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                selectedCategory === "all"
+                  ? "bg-purple-600 text-white shadow-lg"
+                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
               }`}
             >
               All Events
@@ -190,8 +209,8 @@ export default function HomePage() {
                 onClick={() => setSelectedCategory(category.name)}
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium whitespace-nowrap transition ${
                   selectedCategory === category.name
-                    ? 'bg-purple-600 text-white shadow-lg'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    ? "bg-purple-600 text-white shadow-lg"
+                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                 }`}
               >
                 {categoryIcons[category.name]}
@@ -207,7 +226,10 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-8">
             <h2 className="text-3xl font-bold text-gray-800 mb-2">
-              {selectedCategory === 'all' ? 'All Events' : categories.find(cat => cat.name === selectedCategory)?.display_name}
+              {selectedCategory === "all"
+                ? "All Events"
+                : categories.find((cat) => cat.name === selectedCategory)
+                    ?.display_name}
             </h2>
             <p className="text-gray-600">Browse events by category</p>
           </div>
@@ -215,13 +237,19 @@ export default function HomePage() {
           {filteredEvents.length === 0 ? (
             <div className="text-center py-16">
               <Calendar className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-gray-600 mb-2">No events found</h3>
-              <p className="text-gray-500">Try adjusting your search or filters</p>
+              <h3 className="text-xl font-semibold text-gray-600 mb-2">
+                No events found
+              </h3>
+              <p className="text-gray-500">
+                Try adjusting your search or filters
+              </p>
             </div>
           ) : (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {filteredEvents.map((event) => (
-                <EventCard key={event.id} event={event} />
+                <Link  key={event.id} to={`/event`}>
+                  <EventCard event={event} />
+                </Link>
               ))}
             </div>
           )}
@@ -232,15 +260,23 @@ export default function HomePage() {
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-8">
-            <h2 className="text-3xl font-bold text-gray-800 mb-2">Scheduled Events</h2>
-            <p className="text-gray-600">Upcoming events you can register for</p>
+            <h2 className="text-3xl font-bold text-gray-800 mb-2">
+              Scheduled Events
+            </h2>
+            <p className="text-gray-600">
+              Upcoming events you can register for
+            </p>
           </div>
 
           {scheduledEvents.length === 0 ? (
             <div className="text-center py-16">
               <Calendar className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-gray-600 mb-2">No scheduled events</h3>
-              <p className="text-gray-500">Check back later for upcoming events</p>
+              <h3 className="text-xl font-semibold text-gray-600 mb-2">
+                No scheduled events
+              </h3>
+              <p className="text-gray-500">
+                Check back later for upcoming events
+              </p>
             </div>
           ) : (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -279,10 +315,18 @@ export default function HomePage() {
             <div>
               <h3 className="font-semibold mb-4">Support</h3>
               <div className="space-y-2 text-sm text-gray-400">
-                <div className="hover:text-white cursor-pointer">Help Center</div>
-                <div className="hover:text-white cursor-pointer">Contact Us</div>
-                <div className="hover:text-white cursor-pointer">Privacy Policy</div>
-                <div className="hover:text-white cursor-pointer">Terms of Service</div>
+                <div className="hover:text-white cursor-pointer">
+                  Help Center
+                </div>
+                <div className="hover:text-white cursor-pointer">
+                  Contact Us
+                </div>
+                <div className="hover:text-white cursor-pointer">
+                  Privacy Policy
+                </div>
+                <div className="hover:text-white cursor-pointer">
+                  Terms of Service
+                </div>
               </div>
             </div>
             <div>

@@ -35,12 +35,12 @@ function App() {
 
           {/* Protected Routes */}
           <Route element={<ProtectedRoute />}>
-            <Route element={<AuthLayout />}>
-              <Route path='/dashboard-organizer' element={<OrganizerDashboard />}/>
-              <Route path='/profile' element={<DetailProfile />} />
-              <Route path="/create-event" element={<CreateEvent />} />
-              <Route path="/detail-event/:id" element={<DetailEvent />}/>
-              <Route path="/update-event/:id" element={<UpdateEvent />}/>
+            <Route path="/organizer" element={<AuthLayout />}>
+              <Route path="dashboard" element={<OrganizerDashboard />}/>
+              <Route path="profile" element={<DetailProfile />} />
+              <Route path="create-event" element={<CreateEvent />} />
+              <Route path="detail-event/:id" element={<DetailEvent />}/>
+              <Route path="update-event/:id" element={<UpdateEvent />}/>
             </Route>
           </Route>
         </Routes>

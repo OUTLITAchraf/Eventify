@@ -71,7 +71,7 @@ function AuthLayout() {
                                         {dropdownOpen && (
                                             <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border z-20">
                                                 <Link
-                                                    to="/profile"
+                                                    to="/organizer/profile"
                                                     onClick={() => setDropdownOpen(false)}
                                                     className="w-full px-4 py-3 text-left hover:bg-gray-50 flex items-center gap-3 text-gray-700"
                                                 >
@@ -110,12 +110,9 @@ function AuthLayout() {
                         {mobileMenuOpen && (
                             <div className="md:hidden py-4 border-t">
                                 <div className="flex flex-col gap-4">
-                                    <Link to="/" className="text-gray-700 hover:text-purple-600 font-medium">Events</Link>
-                                    <Link to="#" className="text-gray-700 hover:text-purple-600 font-medium">Categories</Link>
-                                    <Link to="#" className="text-gray-700 hover:text-purple-600 font-medium">About</Link>
                                     {user ? (
                                         <>
-                                            <Link to="/profile" className="text-gray-700 hover:text-purple-600 font-medium">Profile</Link>
+                                            <Link to="organizer/profile" className="text-gray-700 hover:text-purple-600 font-medium">Profile</Link>
                                             <button onClick={handleLogout} className="px-6 py-2 text-red-600 border-2 border-red-500 rounded-lg font-semibold hover:bg-red-50 transition">
                                                 Logout
                                             </button>

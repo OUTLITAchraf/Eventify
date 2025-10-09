@@ -36,7 +36,7 @@ export default function LoginPage() {
       if (result.token) {
         // Store token in localStorage
         localStorage.setItem("token", result.token);
-        navigate("/dashboard-organizer")
+        navigate("/organizer/dashboard")
       }
     } catch (err) {
       console.error("Login failed:", err);
