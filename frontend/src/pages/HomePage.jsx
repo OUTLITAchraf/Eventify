@@ -69,7 +69,7 @@ export default function HomePage() {
           className="w-full h-48 object-cover"
         />
         <div className="absolute top-3 right-3">
-          {event.type === 'onstage' ? (
+          {event.type === 'OnStage' ? (
             <span className="px-3 py-1 rounded-full text-xs font-semibold bg-white bg-opacity-90 text-blue-700 flex items-center gap-1 shadow-lg">
               <Building className="w-3 h-3" />
               On Stage
@@ -99,7 +99,7 @@ export default function HomePage() {
             <span>{formatTime(event.start_time)}</span>
           </div>
 
-          {event.type === 'onstage' ? (
+          {event.type === 'OnStage' ? (
             <div className="flex items-start text-gray-600 text-sm">
               <MapPin className="w-4 h-4 mr-2 text-purple-600 flex-shrink-0 mt-0.5" />
               <span className="line-clamp-1">{event.location}</span>
