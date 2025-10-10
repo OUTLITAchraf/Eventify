@@ -356,6 +356,36 @@ export default function EventDetailParticipant() {
                     </div>
                   </div>
                 ) : null}
+
+                {/* Capacity Information */}
+                <div className="flex items-start gap-3">
+                  <User className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
+                  <div className="flex-1">
+                    <p className="text-sm text-gray-500">Capacity</p>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="font-semibold text-gray-800">
+                        {event.current_participants || 0} / {event.capacity || 0} registered
+                      </span>
+                      <span className={`text-xs font-medium px-2 py-1 rounded-full ${
+                        event.current_participants >= event.capacity
+                          ? 'bg-red-100 text-red-700'
+                          : 'bg-green-100 text-green-700'
+                      }`}>
+                        {event.capacity > 0 ? Math.round((event.current_participants / event.capacity) * 100) : 0}% full
+                      </span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div
+                        className={`h-2 rounded-full ${
+                          event.current_participants >= event.capacity ? 'bg-red-500' : 'bg-purple-600'
+                        }`}
+                        style={{
+                          width: `${event.capacity > 0 ? Math.min((event.current_participants / event.capacity) * 100, 100) : 0}%`
+                        }}
+                      ></div>
+                    </div>
+                  </div>
+                </div>
               </div>
 
               {/* Register Button */}

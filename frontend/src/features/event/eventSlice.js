@@ -109,7 +109,7 @@ const eventSlice = createSlice({
         state.status = "succeeded";
         state.events = action.payload;
         state.error = null;
-        console.log("Fetched events:", action.payload.events);
+        console.log("Fetched events:", action.payload);
       })
       .addCase(fetchEvents.rejected, (state, action) => {
         state.status = "failed";
@@ -126,7 +126,7 @@ const eventSlice = createSlice({
         state.status = "succeeded";
         state.categories = action.payload;
         state.error = null;
-        console.log("Fetched categories:", action.payload.categories);
+        console.log("Fetched categories:", action.payload);
       })
       .addCase(fetchCategories.rejected, (state, action) => {
         state.status = "failed";
@@ -177,13 +177,13 @@ const eventSlice = createSlice({
       })
       .addCase(fetchEventById.fulfilled, (state, action) => {
         state.status = "succeeded";
-        state.currentEvent = action.payload.event || action.payload;
+        state.currentEvent = action.payload;
         state.error = null;
         console.log("Event detail fetched:", action.payload);
       })
       .addCase(fetchEventById.rejected, (state, action) => {
         state.status = "failed";
-        state.error = action.payload.event || action.payload
+        state.error = action.payload;
         console.error("fetchEventById rejected:", action.payload);
       });
     builder

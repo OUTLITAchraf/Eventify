@@ -160,6 +160,25 @@ export default function HomePage() {
               <span className="truncate hover:underline">Join Online</span>
             </div>
           )}
+
+          <div className="flex items-center justify-between text-sm pt-2 border-t border-gray-100">
+            <span className="text-gray-600">
+              {event.current_participants || 0} / {event.capacity || 0} participants
+            </span>
+            <div className="flex items-center">
+              <div className="w-16 bg-gray-200 rounded-full h-2 mr-2">
+                <div
+                  className="bg-purple-600 h-2 rounded-full"
+                  style={{
+                    width: `${event.capacity > 0 ? Math.min((event.current_participants / event.capacity) * 100, 100) : 0}%`
+                  }}
+                ></div>
+              </div>
+              <span className={`text-xs font-medium ${event.current_participants >= event.capacity ? 'text-red-600' : 'text-green-600'}`}>
+                {event.capacity > 0 ? Math.round((event.current_participants / event.capacity) * 100) : 0}%
+              </span>
+            </div>
+          </div>
         </div>
       </div>
     </div>

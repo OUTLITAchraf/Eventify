@@ -19,6 +19,7 @@ class Event extends Model
         'location',
         'link',
         'image',
+        'capacity',
         'category_id',
         'organizer_id'
     ];
@@ -33,5 +34,9 @@ class Event extends Model
     
     public function participants() {
         return $this->hasMany(Participant::class);
+    }
+
+    public function getCurrentParticipantsCountAttribute() {
+        return $this->participants()->count();
     }
 }

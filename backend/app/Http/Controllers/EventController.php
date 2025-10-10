@@ -18,7 +18,7 @@ class EventController extends Controller
         return response()->json([
             'message' => 'Events Fetched Successfully',
             'events' => $events
-        ], 201);
+        ], 200);
     }
 
     /**
@@ -56,6 +56,7 @@ class EventController extends Controller
             'location' => 'nullable|string|max:255',
             'link' => 'nullable|url|max:255',
             'image' => 'required|string|url|max:255',
+            'capacity' => 'required|integer|min:0',
         ]);
 
         $event = new Event($validated);
@@ -73,12 +74,30 @@ class EventController extends Controller
      */
     public function show(Event $event)
     {
-        $event = Event::findOrFail($event->id)->load('organizer', 'category');
+        $event = Event::with('organizer', 'category')->findOrFail($event->id);
+        $eventData = [
+            'id' => $event->id,
+            'name' => $event->name,
+            'description' => $event->description,
+            'start_time' => $event->start_time,
+            'end_time' => $event->end_time,
+            'status' => $event->status,
+            'type' => $event->type,
+            'location' => $event->location,
+            'link' => $event->link,
+            'image' => $event->image,
+            'capacity' => $event->capacity,
+            'current_participants' => $event->current_participants_count,
+            'category' => $event->category,
+            'organizer' => $event->organizer,
+            'created_at' => $event->created_at,
+            'updated_at' => $event->updated_at,
+        ];
 
         return response()->json([
             'message' => 'Event Fetched Successfully',
-            'event' => $event
-        ], 201);
+            'event' => $eventData
+        ], 200);
     }
 
     /**
@@ -117,6 +136,7 @@ class EventController extends Controller
             'location' => 'sometimes|nullable|string|max:255',
             'link' => 'sometimes|nullable|url|max:255',
             'image' => 'sometimes|nullable|string|url|max:255',
+            'capacity' => 'sometimes|required|integer|min:0',
         ]);
 
         if ($request->has('image') && $event->image) {

@@ -86,6 +86,12 @@ const validationSchema = yup.object().shape({
     .required("Category is required")
     .min(1, "Please select a category")
     .typeError("Category must be a number"),
+  capacity: yup
+    .number()
+    .required("Capacity is required")
+    .min(1, "Capacity must be at least 1")
+    .max(10000, "Capacity cannot exceed 10,000")
+    .typeError("Capacity must be a number"),
   location: yup.string().when("type", {
     is: "OnStage",
     then: (schema) =>
@@ -113,6 +119,7 @@ const defaultValues = {
   status: "scheduled",
   type: "OnStage",
   category_id: 0,
+  capacity: "",
   location: "",
   link: "",
   image: null,
@@ -175,6 +182,7 @@ export default function UpdateEventForm() {
         status: event.status || "scheduled",
         type: event.type || "OnStage",
         category_id: event.category_id || 0,
+        capacity: event.capacity || "",
         location: event.location || "",
         link: event.link || "",
       });
@@ -247,6 +255,7 @@ export default function UpdateEventForm() {
           status: data.status,
           type: data.type,
           category_id: data.category_id,
+          capacity: data.capacity,
           location: data.type === "OnStage" ? data.location : null,
           link: data.type === "Online" ? data.link : null,
           image: finalImageUrl,
@@ -314,6 +323,7 @@ export default function UpdateEventForm() {
         status: event.status || "scheduled",
         type: event.type || "OnStage",
         category_id: event.category_id || 0,
+        capacity: event.capacity || "",
         location: event.location || "",
         link: event.link || "",
         image: null,
@@ -323,7 +333,7 @@ export default function UpdateEventForm() {
       reset(defaultValues);
       setImagePreview(null);
     }
-  }, [reset, event]);  
+  }, [reset, event]);
 
   if (status === "loading") {
     return (
@@ -610,6 +620,37 @@ export default function UpdateEventForm() {
                     )}
                   />
                   <ErrorMessage name="category_id" />
+                </div>
+
+                {/* Capacity Input */}
+                <div>
+                  <label
+                    htmlFor="capacity"
+                    className="block text-sm font-medium text-gray-700 mb-2"
+                  >
+                    Event Capacity <span className="text-red-500">*</span>
+                  </label>
+                  <Controller
+                    name="capacity"
+                    control={control}
+                    render={({ field }) => (
+                      <input
+                        {...field}
+                        type="number"
+                        id="capacity"
+                        min="1"
+                        max="10000"
+                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent outline-none transition ${
+                          errors.capacity ? "border-red-500" : "border-gray-300"
+                        }`}
+                        placeholder="Enter maximum number of participants"
+                      />
+                    )}
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Maximum number of participants allowed (1-10,000)
+                  </p>
+                  <ErrorMessage name="capacity" />
                 </div>
               </div>
             </div>
