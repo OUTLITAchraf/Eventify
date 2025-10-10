@@ -1,140 +1,179 @@
-# Eventify - Full Stack Event Management Platform
+# Eventify
 
-![Laravel](https://img.shields.io/badge/Laravel-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)
-![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
+A comprehensive event management system built with Laravel and React that allows users to create, manage, and participate in events.
 
-Welcome to **Eventify**, a full-stack application for discovering, creating, and managing events. This repository contains the complete source code for the project, split into a Laravel-powered backend and a modern JavaScript frontend.
+## 🚀 Features
 
-## Table of Contents
+- **User Authentication**: Secure login and registration with email verification
+- **Role-Based Access Control**: Different permissions for organizers and participants using Laratrust
+- **Event Management**: Create, update, delete, and view events
+- **Participant Registration**: Easy registration for events with email confirmations
+- **Categories**: Organize events by categories
+- **Media Upload**: Cloudinary integration for event images
+- **Responsive Design**: Modern UI built with Tailwind CSS and Radix UI components
+- **Real-time Notifications**: Toast notifications for user feedback
+- **Email Notifications**: Automated email confirmations for registrations
 
-- [About The Project](#about-the-project)
-- [Tech Stack](#tech-stack)
-- [Project Structure](#project-structure)
-- [Getting Started](#getting-started)
-  - [Prerequisites](#prerequisites)
-  - [Installation](#installation)
-- [Usage](#usage)
-- [API Endpoints](#api-endpoints)
-- [Contributing](#contributing)
-- [License](#license)
+## 🛠️ Tech Stack
 
-## About The Project
+### Backend
+- **Laravel 10** - PHP web framework
+- **PHP 8.1+** - Server-side scripting
+- **MySQL** - Database
+- **Laravel Sanctum** - API authentication
+- **Laratrust** - Role and permission management
+- **Cloudinary** - Media storage and optimization
 
-Eventify is designed to be a one-stop solution for event management. It provides a RESTful API to handle all the core logic and a separate, decoupled frontend to deliver a seamless user experience.
+### Frontend
+- **React 19** - JavaScript library for building user interfaces
+- **Vite** - Fast build tool and development server
+- **Redux Toolkit** - State management
+- **React Router** - Client-side routing
+- **Tailwind CSS** - Utility-first CSS framework
+- **Radix UI** - Accessible UI components
+- **Axios** - HTTP client for API requests
+- **React Hook Form** - Form handling with validation
 
-**Core Features:**
-*   User authentication and authorization.
-*   Event creation, management, and discovery.
-*   Ticket booking and management.
-*   Media uploads and management via Cloudinary.
+## 📋 Prerequisites
 
-## Tech Stack
+- PHP 8.1 or higher
+- Composer
+- Node.js 16+ and npm
+- MySQL or compatible database
+- Cloudinary account (for media uploads)
 
-This project is built with a modern and robust set of technologies:
+## 🔧 Installation
 
-*   **Backend (`/backend`)**
-    *   Laravel: A PHP framework for web artisans.
-    *   Laravel Breeze: For API authentication scaffolding.
-    *   Cloudinary: For cloud-based image management.
-    *   MySQL / PostgreSQL: As the primary database.
+### Backend Setup
 
-*   **Frontend (`/frontend`)**
-    *   A modern JavaScript framework (e.g., React, Vue, or Angular).
-    *   Node.js & npm: For package management and running the development server.
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd eventify/backend
+   ```
 
-## Project Structure
+2. **Install PHP dependencies**
+   ```bash
+   composer install
+   ```
 
-The repository is organized into two main directories:
+3. **Environment configuration**
+   ```bash
+   cp .env.example .env
+   ```
+   Update the `.env` file with your database credentials, mail settings, and Cloudinary configuration.
+
+4. **Generate application key**
+   ```bash
+   php artisan key:generate
+   ```
+
+5. **Run database migrations and seeders**
+   ```bash
+   php artisan migrate
+   php artisan db:seed
+   ```
+
+6. **Start the Laravel server**
+   ```bash
+   php artisan serve
+   ```
+
+### Frontend Setup
+
+1. **Navigate to frontend directory**
+   ```bash
+   cd ../frontend
+   ```
+
+2. **Install Node.js dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Environment configuration**
+   ```bash
+   cp .env.example .env
+   ```
+   Update the `.env` file with your backend API URL.
+
+4. **Start the development server**
+   ```bash
+   npm run dev
+   ```
+
+## 🚀 Usage
+
+### API Endpoints
+
+#### Public Routes
+- `POST /api/register` - User registration
+- `POST /api/login` - User login
+- `GET /api/events` - List all events
+- `GET /api/event/{id}` - Get event details
+- `GET /api/categories` - List event categories
+- `POST /api/register-participant` - Register for an event
+
+#### Protected Routes (Require Authentication)
+- `GET /api/user` - Get current user info
+- `POST /api/logout` - User logout
+- `POST /api/create-event` - Create new event
+- `PUT /api/update-event/{id}` - Update event
+- `DELETE /api/delete-event/{id}` - Delete event
+
+### User Roles
+
+- **Participant**: Can view events and register for them
+- **Organizer**: Can create, update, and manage their own events
+
+## 📁 Project Structure
 
 ```
-Eventify/
-├── backend/      # Contains the Laravel API
-├── frontend/     # Contains the JavaScript client application
-└── README.md     # You are here!
+eventify/
+├── backend/                 # Laravel API
+│   ├── app/
+│   │   ├── Http/Controllers/    # API Controllers
+│   │   ├── Models/             # Eloquent Models
+│   │   ├── Mail/               # Email templates
+│   │   └── Providers/          # Service providers
+│   ├── database/
+│   │   ├── migrations/         # Database migrations
+│   │   └── seeders/           # Database seeders
+│   ├── routes/
+│   │   └── api.php            # API routes
+│   └── config/                # Configuration files
+└── frontend/               # React SPA
+    ├── src/
+    │   ├── components/        # Reusable UI components
+    │   ├── features/          # Redux slices
+    │   ├── layouts/           # Layout components
+    │   ├── pages/             # Page components
+    │   └── services/          # API services
+    ├── public/                # Static assets
+    └── package.json           # Dependencies and scripts
 ```
 
-## Getting Started
+## 🤝 Contributing
 
-Follow these instructions to get a local copy of the project up and running on your machine for development and testing purposes.
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-### Prerequisites
+## 📝 License
 
-Ensure you have the following software installed:
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-*   PHP >= 8.1
-*   Composer
-*   Node.js (which includes npm)
-*   A database server (e.g., MySQL, PostgreSQL)
+## 📧 Support
 
-### Installation
+For support, email support@eventify.com or create an issue in the repository.
 
-1.  **Clone the repository**
-    ```sh
-    git clone https://github.com/your-username/eventify.git
-    cd eventify
-    ```
+## 🔄 Future Enhancements
 
-2.  **Set up the Backend**
-    Navigate into the backend directory and follow the setup steps.
-    ```sh
-    cd backend
-    
-    # Install PHP dependencies
-    composer install
-    
-    # Create and configure your environment file
-    cp .env.example .env
-    
-    # Open .env and set your DB_ and CLOUDINARY_ credentials
-    
-    # Generate an application key
-    php artisan key:generate
-    
-    # Run database migrations and seeders
-    php artisan migrate --seed
-    ```
-
-3.  **Set up the Frontend**
-    Navigate into the frontend directory from the project root.
-    ```sh
-    cd ../frontend 
-    
-    # Install JavaScript dependencies
-    npm install
-    
-    # You may need to create a .env file for the frontend as well
-    # cp .env.example .env 
-    # Then, configure variables like the API URL
-    ```
-
-## Usage
-
-You will need to run both the backend and frontend servers simultaneously in separate terminal windows.
-
-1.  **Run the Backend Server** (from the `/backend` directory)
-    ```sh
-    php artisan serve
-    ```
-    The API will be available at `http://127.0.0.1:8000`.
-
-2.  **Run the Frontend Development Server** (from the `/frontend` directory)
-    ```sh
-    npm run dev
-    ```
-    The application will be available at `http://localhost:5173` (or another port specified by your setup).
-
-## API Endpoints
-
-The backend provides a stateless RESTful API. For a full list of available API routes, you can run the following command from the `/backend` directory:
-
-```sh
-php artisan route:list
-```
-
-## Contributing
-
-Contributions are what make the open-source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**. Please see the `CONTRIBUTING.md` file for details.
-
-## License
-
-This project is licensed under the MIT License - see the `LICENSE.md` file for details.
+- [ ] Event calendar view
+- [ ] Payment integration for paid events
+- [ ] Event analytics dashboard
+- [ ] Mobile app development
+- [ ] Multi-language support
+- [ ] Event templates
