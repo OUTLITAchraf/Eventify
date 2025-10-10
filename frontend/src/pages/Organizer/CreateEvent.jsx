@@ -443,6 +443,7 @@ export default function CreateEventForm() {
                         <option value="scheduled">Scheduled</option>
                         <option value="ongoing">Ongoing</option>
                         <option value="completed">Completed</option>
+                        <option value="cancelled">Cancelled</option>
                       </select>
                     )}
                   />

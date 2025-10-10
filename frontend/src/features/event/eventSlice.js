@@ -177,13 +177,13 @@ const eventSlice = createSlice({
       })
       .addCase(fetchEventById.fulfilled, (state, action) => {
         state.status = "succeeded";
-        state.currentEvent = action.payload;
+        state.currentEvent = action.payload.event || action.payload;
         state.error = null;
         console.log("Event detail fetched:", action.payload);
       })
       .addCase(fetchEventById.rejected, (state, action) => {
         state.status = "failed";
-        state.error = action.payload;
+        state.error = action.payload.event || action.payload
         console.error("fetchEventById rejected:", action.payload);
       });
     builder

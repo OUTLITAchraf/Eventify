@@ -104,8 +104,6 @@ export default function EventDetail() {
   const isOnline = event.type === "Online" || event.type === "OnStage ";
 
   // Action button text change
-  const actionText = isOnline ? "Join Event" : "View Location";
-  const ActionIcon = isOnline ? ExternalLink : MapPin;
   const LocationIcon = isOnline ? Monitor : Building;
 
   return (

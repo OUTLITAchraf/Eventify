@@ -51,7 +51,7 @@ class EventController extends Controller
             'category_id' => 'required|exists:categories,id',
             'start_time' => 'required|date',
             'end_time' => 'required|date|after_or_equal:start_time',
-            'status' => 'required|in:scheduled,ongoing,completed',
+            'status' => 'required|in:scheduled,ongoing,completed,cancelled',
             'type' => 'required|in:Online,OnStage',
             'location' => 'nullable|string|max:255',
             'link' => 'nullable|url|max:255',

@@ -79,7 +79,7 @@ const validationSchema = yup.object().shape({
     .required("End Date & Time is required")
     .typeError("Must be a valid date and time")
     .min(yup.ref("start_time"), "End time must be after start time"),
-  status: yup.string().oneOf(["scheduled", "ongoing", "completed"]).required(),
+  status: yup.string().oneOf(["scheduled", "ongoing", "completed", "cancelled"]).required(),
   type: yup.string().oneOf(["OnStage", "Online"]).required(),
   category_id: yup
     .number()
@@ -323,10 +323,9 @@ export default function UpdateEventForm() {
       reset(defaultValues);
       setImagePreview(null);
     }
-  }, [reset, event]);
+  }, [reset, event]);  
 
-  // --- LOADING/ERROR STATES ---
-  if (status === "loading" && !event) {
+  if (status === "loading") {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
@@ -335,7 +334,7 @@ export default function UpdateEventForm() {
     );
   }
 
-  if (status === "failed" && !event) {
+  if (status === "failed") {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="bg-red-50 text-red-600 p-4 rounded-md">
@@ -537,6 +536,7 @@ export default function UpdateEventForm() {
                         <option value="scheduled">Scheduled</option>
                         <option value="ongoing">Ongoing</option>
                         <option value="completed">Completed</option>
+                        <option value="cancelled">Cancelled</option>
                       </select>
                     )}
                   />

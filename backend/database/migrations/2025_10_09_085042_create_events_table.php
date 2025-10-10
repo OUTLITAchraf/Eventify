@@ -16,7 +16,7 @@ return new class extends Migration {
             $table->text('description');
             $table->dateTime('start_time');
             $table->dateTime('end_time');
-            $table->enum('status', ['scheduled', 'ongoing', 'completed'])->default('scheduled');
+            $table->enum('status', ['scheduled', 'ongoing', 'completed', 'cancelled'])->default('scheduled');
             $table->enum('type', ['Online', 'OnStage']);
             $table->string('location')->nullable();
             $table->string('link')->nullable();

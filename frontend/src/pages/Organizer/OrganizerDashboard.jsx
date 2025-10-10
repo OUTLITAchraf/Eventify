@@ -21,6 +21,7 @@ import {
   User,
   User2,
   User2Icon,
+  XCircle,
 } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchEvents, deleteEvent } from "../../features/event/eventSlice";
@@ -49,11 +50,13 @@ export default function OrganizerDashboard() {
       scheduled: "bg-blue-100 text-blue-700 border-blue-200",
       ongoing: "bg-green-100 text-green-700 border-green-200",
       completed: "bg-gray-100 text-gray-700 border-gray-200",
+      cancelled: "bg-red-100 text-red-700 border-red-200",
     };
     const icons = {
       scheduled: Clock,
       ongoing: AlertCircle,
       completed: CheckCircle,
+      cancelled: XCircle,
     };
     const Icon = icons[status];
     return (
