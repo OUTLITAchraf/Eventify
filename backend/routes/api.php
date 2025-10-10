@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\EventController;
+use App\Http\Controllers\ParticipantController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -24,6 +25,7 @@ Route::middleware('api')->group(function () {
     Route::get('/events',[EventController::class, 'index']);
     Route::get('/event/{event}', [EventController::class, 'show']);
     Route::get('/categories', [CategoryController::class, 'index']);
+    Route::post('/register-participant', [ParticipantController::class, 'store']);
     
     // Protected routes
     Route::middleware('auth:sanctum')->group(function () {

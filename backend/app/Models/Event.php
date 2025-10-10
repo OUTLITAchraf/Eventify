@@ -29,5 +29,9 @@ class Event extends Model
 
     public function category() {
         return $this->belongsTo(Category::class, 'category_id');
-    }    
+    } 
+    
+    public function participants() {
+        return $this->hasMany(Participant::class);
+    }
 }
