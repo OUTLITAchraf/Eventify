@@ -247,7 +247,7 @@ export default function HomePage() {
           ) : (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {filteredEvents.map((event) => (
-                <Link  key={event.id} to={`/event`}>
+                <Link  key={event.id} to={`/event/${event.id}`}>
                   <EventCard event={event} />
                 </Link>
               ))}

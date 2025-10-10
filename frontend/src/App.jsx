@@ -13,7 +13,7 @@ import CreateEvent from "./pages/Organizer/CreateEvent"
 import DetailEvent from "./pages/Organizer/DetailEvent"
 import UpdateEvent from "./pages/Organizer/UpdateEvent"
 import { Toaster } from 'react-hot-toast'
-import EventDetailPage from './pages/Participant/EventDetailParticipant'
+import EventDetailParticipant from './pages/Participant/EventDetailParticipant'
 
 function App() {
   return (
@@ -24,7 +24,7 @@ function App() {
           {/* Public Routes */}
           <Route element={<GuestLayout />}>
             <Route path='/' element={<HomePage />} />
-            <Route path='/event' element={<EventDetailPage/>}/>
+            <Route path='/event/:id' element={<EventDetailParticipant/>}/>
           </Route>
 
           {/* Guest-only Routes */}
