@@ -168,12 +168,3 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 📧 Support
 
 For support, email support@eventify.com or create an issue in the repository.
-
-## 🔄 Future Enhancements
-
-- [ ] Event calendar view
-- [ ] Payment integration for paid events
-- [ ] Event analytics dashboard
-- [ ] Mobile app development
-- [ ] Multi-language support
-- [ ] Event templates
