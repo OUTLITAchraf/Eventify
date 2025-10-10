@@ -215,16 +215,6 @@ export default function EventDetailParticipant() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <button className="flex items-center gap-2 text-gray-600 hover:text-purple-600 transition">
-            <ArrowLeft className="w-5 h-5" />
-            <span className="font-medium">Back to Events</span>
-          </button>
-        </div>
-      </header>
-
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Event Image */}
         <div className="relative rounded-2xl overflow-hidden shadow-2xl mb-8">
