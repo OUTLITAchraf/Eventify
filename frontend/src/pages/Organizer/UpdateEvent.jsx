@@ -102,23 +102,7 @@ const validationSchema = yup.object().shape({
         .required('Online Meeting Link is required for "On Platform" events'),
     otherwise: (schema) => schema.notRequired().transform(() => ""),
   }),
-  image: yup
-    .mixed()
-    .nullable() // Make it nullable for updates
-    .test("fileOrUrl", "Image must be a valid file or link", (value) => {
-      // If null, it's valid (removed image)
-      if (value === null) return true;
-      // If string, assume it's the existing URL and it's valid
-      if (typeof value === "string") return true;
-      // If File object, check size and type (for new upload)
-      if (value instanceof File) {
-        if (value.size > 10485760) return false; // 10MB limit
-        if (!["image/jpeg", "image/png", "image/gif"].includes(value.type))
-          return false;
-        return true;
-      }
-      return false; // Should not happen
-    }),
+  image: yup.mixed().nullable(),
 });
 
 const defaultValues = {
@@ -223,8 +207,8 @@ export default function UpdateEventForm() {
   );
 
   const removeImage = useCallback(() => {
-    // Set a flag value to signal removal to the backend
-    setValue("image", "REMOVE_IMAGE_FLAG", { shouldValidate: true });
+    // Set the value to null to signal removal
+    setValue("image", null, { shouldValidate: true });
     setImagePreview(null);
   }, [setValue]);
 
@@ -232,7 +216,7 @@ export default function UpdateEventForm() {
   const onSubmit = async (data) => {
     // 💡 Create the promise function that handles the dispatch logic
     const updatePromise = new Promise(async (resolve, reject) => {
-      let finalImageUrl = data.image; // Start with the value in the form (URL string, File object, or null)
+      let finalImageUrl = event.image; // Start with the original image URL
 
       try {
         if (data.image instanceof File) {
@@ -240,6 +224,9 @@ export default function UpdateEventForm() {
           toast.loading("Uploading new image...", { id: "image-upload" });
           finalImageUrl = await uploadToCloudinary(data.image);
           toast.success("Image uploaded successfully!", { id: "image-upload" });
+        } else if (data.image === null) {
+          // If image is explicitly set to null, it means we want to remove it
+          finalImageUrl = null;
         }
 
         const formattedData = {
