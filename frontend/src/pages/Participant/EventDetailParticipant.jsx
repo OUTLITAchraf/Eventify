@@ -23,6 +23,7 @@ import {
   Film,
 } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
+import toast from "react-hot-toast";
 import { fetchEventById } from "../../features/event/eventSlice";
 import { useNavigate, useParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
@@ -73,25 +74,35 @@ export default function EventDetailParticipant() {
   } = useSelector((state) => state.participants);
 
   // Submit handler
-  const onSubmit = (data) => {
-    dispatch(registerParticipant({ ...data, event_id: event.id }));
-  };
+  const onSubmit = async (data) => {
+    const registrationPromise = dispatch(
+      registerParticipant({ ...data, event_id: event.id })
+    ).unwrap();
 
-  // Auto-close modal on success
-  useEffect(() => {
-    if (registrationStatus === "succeeded") {
-      setTimeout(() => {
+    await toast
+      .promise(registrationPromise, {
+        loading: "Submitting your registration...",
+        success: (result) =>
+          result.message || "You have successfully registered!",
+        error: (err) =>
+          err.message || "Registration failed. Please try again.",
+      })
+      .then(() => {
+        // On success, close modal and reset form
         setIsRegistrationOpen(false);
         dispatch(resetRegistrationStatus());
         reset();
-      }, 2000);
-    }
-  }, [registrationStatus, dispatch, reset]);
+      })
+      .catch(() => {
+        // Error is already handled by the toast, but you can add logic here if needed
+      });
+  };
 
-  // Fetch event data from API
   useEffect(() => {
-    dispatch(fetchEventById(id));
-  }, [dispatch]);
+    if (id) {
+      dispatch(fetchEventById(id));
+    }
+  }, [dispatch, id]);
 
   const formatDateTime = (dateTimeString) => {
     const date = new Date(dateTimeString);
@@ -210,8 +221,6 @@ export default function EventDetailParticipant() {
       style: "bg-red-100 text-red-700",
     },
   };
-
-  console.log(registrationStatus);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -443,19 +452,6 @@ export default function EventDetailParticipant() {
                     </p>
                   )}
                 </div>
-
-                {/* Feedback Messages */}
-                {registrationError && (
-                  <p className="text-red-600 text-sm mt-2">
-                    {registrationError}
-                  </p>
-                )}
-                {registrationStatus === "succeeded" && (
-                  <p className="text-green-600 text-sm mt-2">
-                    {registrationInfo?.message ||
-                      "You have successfully registered!"}
-                  </p>
-                )}
 
                 {/* Buttons */}
                 <div className="flex gap-3 mt-6">
