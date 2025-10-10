@@ -14,7 +14,7 @@ Here are your event details:
 | **Time** | {{ \Carbon\Carbon::parse($event->start_time)->format('g:i A') }} - {{ \Carbon\Carbon::parse($event->end_time)->format('g:i A') }} |
 | **Type Event** | {{ $event->type === 'OnStage' ? $event->location : 'Online Event' }} |
 
-<x-mail::button :url="url('http://localhost:5173/event/' . $event->id)">
+<x-mail::button :url="config('app.frontend_url') . '/event/' . $event->id">
 View Event Details
 </x-mail::button>
 

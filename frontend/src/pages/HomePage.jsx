@@ -17,7 +17,7 @@ import {
   Film,
 } from "lucide-react";
 import { fetchEvents, fetchCategories } from "../features/event/eventSlice";
-import { Link } from "react-router-dom";
+import { data, Link } from "react-router-dom";
 
 export default function HomePage() {
   const dispatch = useDispatch();
@@ -56,6 +56,7 @@ export default function HomePage() {
 
   const formatTime = (dateTimeString) => {
     const date = new Date(dateTimeString);
+    
     let hours = date.getHours();
     const minutes = date.getMinutes().toString().padStart(2, "0");
     const ampm = hours >= 12 ? "PM" : "AM";
@@ -66,6 +67,7 @@ export default function HomePage() {
   // Filter events by category and search (for main section)
   const filteredEvents =
     events?.filter((event) => {
+      const isNotCancelled = event.status !== "cancelled";
       const matchesSearch = event.name
         .toLowerCase()
         .includes(searchQuery.toLowerCase());
@@ -73,12 +75,14 @@ export default function HomePage() {
         selectedCategory === "all" ||
         event.category_id ===
           categories.find((cat) => cat.name === selectedCategory)?.id;
-      return matchesSearch && matchesCategory;
+      return isNotCancelled && matchesSearch && matchesCategory;
     }) || [];
 
   // Get only scheduled events (separate section - not affected by category filter)
   const scheduledEvents =
-    events?.filter((event) => event.status === "scheduled") || [];
+    events?.filter(
+      (event) => event.status === "scheduled"
+    ) || [];
 
   const categoryIcons = {
     music: <Music className="w-4 h-4" />,
